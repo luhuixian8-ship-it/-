@@ -163,7 +163,93 @@ async function previewScan(input) {
   }
 }
   
-async function recognizePhoto(){if(!currentScanFile){state.scanError='请先选择一张照片';render();return}if(state.scanBusy)return;state.scanBusy=true;state.scanError='';render();try{const endpoint='/api/recognize';const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:state.scanImage}),signal:AbortSignal.timeout(65000)});const data=await response.json();if(!response.ok)throw Error(data.error||'识别请求失败');state.scanItems=(data.items||[]).filter(x=>names[x.name]&&names[x.name].u!=='boolean').slice(0,30).map(x=>({n:x.name,qty:1,keep:true,confidence:x.confidence||'low'}));if(!state.scanItems.length)state.scanError='没能可靠识别到食材，请手动添加或换张清晰照片。';else log('photo_recognition',{detected:state.scanItems.length});}catch(err){state.scanError='识别失败：'+err.message+'。请检查后端服务地址、网络和 API Key，或改用手动录入。'}finally{state.scanBusy=false;render()}}
+
+async function recognizePhoto() {
+  if (!currentScanFile) {
+    state.scanError = '请先选择一张照片';
+    render();
+    return;
+  }
+  if (state.scanBusy) return;
+
+  state.scanBusy = true;
+  state.scanError = '';
+  render();
+
+  try {
+    const response = await fetch('/api/recognize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: state.scanImage }),
+      signal: AbortSignal.timeout(65000)
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || '识别请求失败');
+    }
+
+    const recognized = Array.isArray(data.items) ? data.items : [];
+    const matched = [];
+    const unmatched = [];
+    const seen = new Set();
+
+    for (const item of recognized) {
+      if (typeof item.name !== 'string') continue;
+      const original = item.name.trim();
+      if (!original) continue;
+
+      const normalized = original.replace(/\s+/g, '');
+
+      const ingredient = D.ingredients.find(ing => {
+        if (ing.n === normalized) return true;
+        return (ing.aliases || []).includes(normalized);
+      });
+
+      if (!ingredient) {
+        if (!unmatched.includes(original)) unmatched.push(original);
+        continue;
+      }
+
+      if (ingredient.u === 'boolean') continue;
+      if (seen.has(ingredient.n)) continue;
+
+      seen.add(ingredient.n);
+
+      matched.push({
+        n: ingredient.n,
+        qty: 1,
+        keep: true,
+        confidence: 'low'
+      });
+    }
+
+    state.scanItems = matched;
+    state.scanUnmatched = unmatched;
+
+    if (unmatched.length) {
+      state.scanError =
+        'AI 还识别到了：' + unmatched.join('、') +
+        '。这些名称暂未匹配食材库，请核对并通过手动补充添加。';
+    } else if (!matched.length) {
+      state.scanError =
+        '没有识别到可直接匹配的食材，请手动补充。';
+    }
+
+    log('photo_recognition', {
+      modelReturned: recognized.length,
+      matched: matched.length,
+      unmatched: unmatched.length
+    });
+
+  } catch (err) {
+    state.scanError = '识别失败：' + err.message;
+  } finally {
+    state.scanBusy = false;
+    render();
+  }
+}
+
 function scanQty(i,d){let x=state.scanItems[i];if(!x)return;let st=names[x.n].u==='meal'?0.5:1;x.qty=Math.max(st,Math.min(9,Math.round((x.qty+d*st)*2)/2));render()}
 function acceptScan(){let chosen=state.scanItems.filter(x=>x.keep);if(!chosen.length){toast('请先选择要入库的食材');return}for(const x of chosen){state.inventory[x.n]=Math.min(9,(state.inventory[x.n]||0)+x.qty)}log('photo_confirmed',{names:chosen.map(x=>x.n)});state.scanItems=[];state.scanImage='';currentScanFile=null;persist();nav('confirm');toast('已加入库存，请核对数量')}
 const links=[['home','⌂','首页'],['scan','📷','拍照'],['pantry','▦','食材'],['results','♧','推荐'],['settings','⚙','设置'],['report','▤','反馈']];
