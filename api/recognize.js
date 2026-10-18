@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     } catch {
       return res.status(502).json({ error: "模型返回的不是有效 JSON", raw: text });
     }
-    return res.status(200).json({ ingredients: parsed.ingredients || [] });
+    return res.status(200).json({ items: (parsed.ingredients || []).map(x => ({ name: x.name, confidence: 'medium' })) });
   } catch (e) {
     return res.status(500).json({ error: String(e.message || e) });
   }
