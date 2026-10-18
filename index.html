@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>清冰箱 · 食材识别菜谱推荐 Demo</title>
+<style>
+:root{
+  --bg:#F7F7F5; --card:#FFFFFF; --line:#E5E3DC; --line2:#D3D1C7;
+  --tx:#2C2C2A; --tx2:#5F5E5A; --tx3:#888780;
+  --ok:#0F6E56; --ok-bg:#E1F5EE; --warn:#854F0B; --warn-bg:#FAEEDA;
+  --bad:#A32D2D; --bad-bg:#FCEBEB; --info:#185FA5; --info-bg:#E6F1FB;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:15px;line-height:1.6}
+.wrap{max-width:640px;margin:0 auto;padding:16px 14px 60px}
+h1{font-size:18px;font-weight:600;margin:8px 0 2px}
+.sub{color:var(--tx3);font-size:13px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+.card h2{font-size:15px;font-weight:600;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.step{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--tx);color:#fff;
+  font-size:12px;align-items:center;justify-content:center;flex:none}
+.hint{font-size:13px;color:var(--tx3);margin:-4px 0 10px}
+button{font-family:inherit;font-size:14px;border-radius:10px;border:1px solid var(--line2);
+  background:#fff;color:var(--tx);padding:9px 14px;cursor:pointer}
+button.primary{background:var(--tx);color:#fff;border-color:var(--tx)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.sm{padding:5px 10px;font-size:13px;border-radius:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=text],input[type=password],select,textarea{font-family:inherit;font-size:14px;
+  border:1px solid var(--line2);border-radius:10px;padding:8px 10px;background:#fff;color:var(--tx);width:100%}
+textarea{resize:vertical;min-height:80px;font-size:13px}
+label.fld{display:block;font-size:12px;color:var(--tx2);margin:8px 0 4px}
+#preview{width:100%;max-height:260px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:none;margin-top:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{background:var(--info-bg);border:1px solid #B5D4F4;border-radius:10px;padding:8px 10px;font-size:13px}
+.chip .nm{font-weight:600;color:#0C447C}
+.chip .meta{display:flex;gap:6px;margin-top:6px}
+.chip select{font-size:12px;padding:3px 4px;border-radius:6px;width:auto}
+.chip .del{color:var(--bad);cursor:pointer;font-size:12px;margin-left:2px}
+.empty{color:var(--tx3);font-size:13px;padding:6px 0}
+.rc{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+.rc .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.rc .nm{font-size:15px;font-weight:600}
+.rc .tags{font-size:12px;color:var(--tx3);margin-top:2px}
+.sc{font-size:20px;font-weight:600;color:var(--ok);line-height:1;white-space:nowrap}
+.sc small{font-size:11px;color:var(--tx3);font-weight:400;display:block;margin-top:3px}
+.bar{height:6px;background:#EFEDE6;border-radius:3px;overflow:hidden;margin:10px 0 6px;display:flex}
+.bar i{display:block;height:100%}
+.b1{background:#1D9E75}.b2{background:#85B7EB}
+.legend{font-size:12px;color:var(--tx2);display:flex;gap:12px;flex-wrap:wrap}
+.lines{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.line{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:3px 0}
+.badge{font-size:11px;padding:2px 7px;border-radius:6px;white-space:nowrap;flex:none}
+.b-ok{background:var(--ok-bg);color:var(--ok)}
+.b-warn{background:var(--warn-bg);color:var(--warn)}
+.b-bad{background:var(--bad-bg);color:var(--bad)}
+.b-info{background:var(--info-bg);color:var(--info)}
+.b-gray{background:#F1EFE8;color:var(--tx2)}
+.note{font-size:12px;color:var(--tx2);margin-top:2px}
+.steps{margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--tx2)}
+.steps li{margin:3px 0}
+.details{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;display:none}
+.details.on{display:block}
+.mini{font-size:12px;color:var(--tx3)}
+.err{background:var(--bad-bg);color:var(--bad);border-radius:10px;padding:10px;font-size:13px;margin-top:10px;display:none}
+.cfg{display:none;margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.cfg.on{display:block}
+.foot{font-size:12px;color:var(--tx3);text-align:center;margin-top:24px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>清冰箱 · 食材识别菜谱推荐</h1>
+  <div class="sub">可执行的 Demo：识别冰箱食材 → 按「最大化利用」排序菜谱 → 缺料给出替换/省略建议</div>
+
+  <!-- Step 1 -->
+  <div class="card">
+    <h2><span class="step">1</span>拍照识别（或直接用示例冰箱）</h2>
+    <div class="hint">接了大模型就能真识别；没接也能用示例冰箱跑通后面的完整链路。</div>
+    <div class="row">
+      <input type="file" id="file" accept="image/*" capture="environment" style="flex:1;min-width:180px;font-size:13px">
+      <button class="primary" id="btnRec" disabled>识别</button>
+    </div>
+    <img id="preview" alt="">
+    <div class="row" style="margin-top:10px">
+      <button class="sm" data-f="上班族小冰箱">示例：上班族小冰箱</button>
+      <button class="sm" data-f="周末采购后">示例：周末采购后</button>
+      <button class="sm" data-f="临期清库存">示例：临期清库存</button>
+      <button class="sm" id="btnCfg">接入在线识别</button>
+    </div>
+
+    <div class="cfg" id="cfg">
+      <label class="fld">API Base URL（OpenAI 兼容，如 https://api.xxx.com/v1）</label>
+      <input type="text" id="base" placeholder="https://api.xxx.com/v1">
+      <label class="fld">API Key</label>
+      <input type="password" id="key" placeholder="sk-...">
+      <label class="fld">模型名</label>
+      <input type="text" id="model" placeholder="如 qwen-vl-max / gpt-4o / glm-4v">
+      <div class="mini" style="margin-top:8px">
+        若浏览器报 CORS，请改用同目录的 <code>recognize_vlm.py</code> 跑识别，再把输出的 JSON 粘到下面导入。
+      </div>
+    </div>
+
+    <div style="margin-top:10px">
+      <label class="fld">或导入识别结果 JSON（recognize_vlm.py 的输出）</label>
+      <textarea id="imp" placeholder='[{"name":"番茄","quantity":"适量","freshness":"新鲜"}]'></textarea>
+      <button class="sm" id="btnImp" style="margin-top:6px">导入</button>
+    </div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="card">
+    <h2><span class="step">2</span>校正识别结果（必做环节）</h2>
+    <div class="hint">识别不可能 100% 准，这一步是产品的一部分，不是补丁。份量只到粗粒度三档。</div>
+    <div class="row">
+      <select id="addSel" style="flex:1;min-width:160px"></select>
+      <button class="sm" id="btnAdd">添加食材</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="empty" id="invEmpty">还没有食材，先识别或选个示例冰箱。</div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="card">
+    <h2><span class="step">3</span>推荐结果</h2>
+    <div class="row" style="margin-bottom:10px">
+      <button class="sm" id="fAll">全部</button>
+      <button class="sm" id="fFree">只看无需补货</button>
+      <span class="mini" id="cnt"></span>
+    </div>
+    <div id="res"></div>
+  </div>
+
+  <div class="foot">
+    推荐分 = 45 × 有效覆盖率（替换/省略后能做成的程度）<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;+ 20 × 原始覆盖率 + 25 × 库存利用率 + 6 × 用到的临期食材数<br>
+    库存利用率是关键：只按菜谱覆盖率排，用 2 样和用 5 样食材的菜会同分，<br>
+    那就退化成普通菜谱搜索了。油盐糖酱油葱姜蒜等常备调味料不计入缺料惩罚。
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+/* ---------- 名称归一：大模型输出的中文名 → 食材 id ---------- */
+const ALIAS = {
+  '西红柿':'tomato','圣女果':'tomato','小番茄':'tomato','马铃薯':'potato','洋芋':'potato',
+  '大白菜':'cabbage','青菜':'cabbage','上海青':'cabbage','小白菜':'cabbage','娃娃菜':'cabbage',
+  '鸡胸':'chicken','鸡脯肉':'chicken','鸡翅':'chickenleg','鸡翅中':'chickenleg','鸡腿肉':'chickenleg',
+  '瘦肉':'pork','肉末':'pork','肉丝':'pork','五花':'porkbelly','五花肉':'porkbelly',
+  '牛腩':'beef','牛肉块':'beef','羊排':'lamb','羊肉片':'lamb',
+  '虾仁':'shrimp','基围虾':'shrimp','明虾':'shrimp',
+  '北豆腐':'tofu','嫩豆腐':'tofu','老豆腐':'tofu','香干':'driedtofu','豆腐干':'driedtofu',
+  '挂面':'noodle','面条':'noodle','方便面':'noodle','吐司':'bread','切片面包':'bread',
+  '奶酪片':'cheese','芝士':'cheese','黄油块':'butter','纯牛奶':'milk',
+  '黑木耳':'woodear','云耳':'woodear','香菜':'cilantro','大葱':'scallion','小葱':'scallion','香葱':'scallion',
+  '生姜':'ginger','大蒜':'garlic','蒜头':'garlic','蒜瓣':'garlic',
+  '酱油':'soysauce','生抽酱油':'soysauce','老抽酱油':'darksoysauce',
+  '米醋':'vinegar','陈醋':'vinegar','白醋':'vinegar','料酒':'cookingwine','黄酒':'cookingwine',
+  '生粉':'starch','玉米淀粉':'starch','红薯粉':'starch','水淀粉':'starch',
+  '干辣椒':'driedchili','辣椒干':'driedchili','花椒粉':'sichuanpepper','麻椒':'sichuanpepper',
+  '八角':'staranise','月桂叶':'bayleaf','白胡椒':'pepper','黑胡椒':'pepper','胡椒粉':'pepper',
+  '芝麻油':'sesame','香油':'sesame','番茄沙司':'ketchup','番茄酱':'ketchup',
+  '咖喱':'curry','咖喱块':'curry','花生米':'peanut','龙口粉丝':'vermicelli',
+  '甜玉米':'corn','红萝卜':'carrot','青椒':'greenpepper','尖椒':'greenpepper','柿子椒':'greenpepper',
+  '西蓝花':'broccoli','四季豆':'greenbean','青瓜':'cucumber','油麦菜':'lettuce',
+  '西芹':'celery','干香菇':'shiitake','剩饭':'rice','隔夜饭':'rice'
+};
+const NAME2ID = {};
+Object.keys(ING).forEach(id=>{ NAME2ID[ING[id].n] = id; });
+Object.keys(ALIAS).forEach(k=>{ if(ING[ALIAS[k]]) NAME2ID[k] = ALIAS[k]; });
+
+function toId(name){
+  if(!name) return null;
+  let s = String(name).trim().replace(/[（(].*?[)）]/g,'').replace(/\s/g,'');
+  if(NAME2ID[s]) return NAME2ID[s];
+  const hit = Object.keys(NAME2ID).find(k=> s.includes(k) || k.includes(s));
+  return hit ? NAME2ID[hit] : null;
+}
+
+/* ---------- 状态 ---------- */
+let inv = [];
+let filtered = false;
+
+const $ = id=>document.getElementById(id);
+
+/* ---------- Step1 ---------- */
+let dataUrl = null;
+$('file').addEventListener('change', e=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = ev=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const c = document.createElement('canvas');
+      const max = 1024;
+      let w = img.width, h = img.height;
+      if(w > max){ h = Math.round(h*max/w); w = max; }
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      dataUrl = c.toDataURL('image/jpeg', 0.8);
+      const p = $('preview');
+      p.src = dataUrl; p.style.display = 'block';
+      $('btnRec').disabled = false;
+    };
+    img.src = ev.target.result;
+  };
+  r.readAsDataURL(f);
+});
+
+$('btnCfg').onclick = ()=> $('cfg').classList.toggle('on');
+
+const PROMPT = '你是冰箱食材识别助手。仔细看图，列出图中所有可见的食材和食品。\n'+
+'只输出 JSON 数组，不要任何解释、不要 markdown 代码块，格式：\n'+
+'[{"name":"番茄","quantity":"适量","freshness":"新鲜"}]\n'+
+'quantity 只能是 少量/适量/充足 之一；freshness 只能是 新鲜/一般/快坏了 之一。\n'+
+'要求：中文食材名；同一食材只出现一次；装在袋子里或只露出一部分的也要尽量识别；不确定的不要输出。';
+
+$('btnRec').onclick = async ()=>{
+  const base = $('base').value.trim(), key = $('key').value.trim(), model = $('model').value.trim();
+  $('err').style.display='none';
+  if(!base || !key || !model){
+    $('err').textContent = '请先点「接入在线识别」填好 Base URL / Key / 模型名，或改用示例冰箱。';
+    $('err').style.display='block'; $('cfg').classList.add('on'); return;
+  }
+  const btn = $('btnRec'); btn.disabled = true; btn.textContent = '识别中...';
+  try{
+    const res = await fetch(base.replace(/\/+$/,'') + '/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body: JSON.stringify({model, temperature:0.2, messages:[
+        {role:'user', content:[{type:'text',text:PROMPT},{type:'image_url',image_url:{url:dataUrl}}]}
+      ]})
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const j = await res.json();
+    let txt = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content || '';
+    txt = String(txt).replace(/```json|```/g,'').trim();
+    const s = txt.indexOf('['), e2 = txt.lastIndexOf(']');
+    if(s<0 || e2<0) throw new Error('模型没有返回 JSON');
+    applyList(JSON.parse(txt.slice(s, e2+1)));
+  }catch(err){
+    $('err').textContent = '识别失败：' + err.message + '。若是 CORS 问题，请改用 recognize_vlm.py 后粘贴 JSON 导入。';
+    $('err').style.display='block';
+  }
+  btn.disabled = false; btn.textContent = '识别';
+};
+
+$('btnImp').onclick = ()=>{
+  try{ applyList(JSON.parse($('imp').value)); $('err').style.display='none'; }
+  catch(e){ $('err').textContent='JSON 解析失败：'+e.message; $('err').style.display='block'; }
+};
+
+document.querySelectorAll('[data-f]').forEach(b=>{
+  b.onclick = ()=>{ inv = SAMPLE_FRIDGES[b.dataset.f].map(x=>({...x})); renderInv(); run(); };
+});
+
+function applyList(list){
+  const merged = {};
+  list.forEach(x=>{
+    const id = toId(x.name);
+    if(!id) return;
+    const f = ['新鲜','一般','快坏了'].includes(x.freshness) ? x.freshness : '新鲜';
+    const q = ['少量','适量','充足'].includes(x.quantity) ? x.quantity : '适量';
+    if(!merged[id] || (f==='快坏了' && merged[id].f!=='快坏了')) merged[id] = {i:id, q, f};
+  });
+  inv = Object.values(merged);
+  renderInv(); run();
+}
+
+/* ---------- Step2 渲染 ---------- */
+function fillAddSel(){
+  const sel = $('addSel');
+  sel.innerHTML = '';
+  Object.keys(ING).sort((a,b)=>ING[a].c.localeCompare(ING[b].c)||ING[a].n.localeCompare(ING[b].n))
+    .forEach(id=>{
+      const o = document.createElement('option');
+      o.value = id; o.textContent = ING[id].n + '（' + ING[id].c + (ING[id].s?' · 常备':'') + '）';
+      sel.appendChild(o);
+    });
+}
+$('btnAdd').onclick = ()=>{
+  const id = $('addSel').value;
+  if(inv.some(x=>x.i===id)) return;
+  inv.push({i:id, q:'适量', f:'新鲜'}); renderInv(); run();
+};
+
+function renderInv(){
+  const box = $('chips'); box.innerHTML = '';
+  $('invEmpty').style.display = inv.length ? 'none' : 'block';
+  inv.forEach((it, idx)=>{
+    const d = document.createElement('div'); d.className = 'chip';
+    const nm = document.createElement('div'); nm.className='nm'; nm.textContent = ING[it.i].n;
+    const meta = document.createElement('div'); meta.className='meta';
+
+    const q = document.createElement('select');
+    ['少量','适量','充足'].forEach(v=>{
+      const o=document.createElement('option'); o.value=v; o.textContent=v;
+      if(it.q===v) o.selected=true; q.appendChild(o);
+    });
+    q.onchange = e=>{ it.q = e.target.value; };
+
+    const f = document.createElement('select');
+    ['新鲜','一般','快坏了'].forEach(v=>{
+      const o=document.createElement('option'); o.value=v; o.textContent=v;
+      if(it.f===v) o.selected=true; f.appendChild(o);
+    });
+    f.onchange = e=>{ it.f = e.target.value; run(); };
+
+    if(it.f==='快坏了'){ f.style.background='#FCEBEB'; f.style.color='#A32D2D'; }
+
+    const del = document.createElement('span'); del.className='del'; del.textContent='移除';
+    del.onclick = ()=>{ inv.splice(idx,1); renderInv(); run(); };
+
+    meta.appendChild(q); meta.appendChild(f); meta.appendChild(del);
+    d.appendChild(nm); d.appendChild(meta); box.appendChild(d);
+  });
+}
+
+/* ---------- Step3 匹配与替换引擎 ---------- */
+function l1pair(a,b){ return L1.find(l=>(l.a===a&&l.b===b)||(l.a===b&&l.b===a)); }
+
+function analyze(){
+  const ids = new Set(inv.map(x=>x.i));
+  const fresh = {}; inv.forEach(x=>fresh[x.i]=x.f);
+
+  const out = RECIPES.map(r=>{
+    // 必需 且 非常备 → 参与覆盖率计算
+    const reqLines = r.ing.filter(x=> x.req==='必需' && !ING[x.i].s);
+    const total = reqLines.length;
+    const matched = reqLines.filter(x=>ids.has(x.i));
+    const missingLines = reqLines.filter(x=>!ids.has(x.i));
+
+    const solved = [], needBuy = [];
+    let nSub = 0, nOmit = 0;
+
+    missingLines.forEach(m=>{
+      // L1：同义替换，优先用冰箱里已有的
+      const l1 = L1.find(l=>(l.a===m.i&&ids.has(l.b)) || (l.b===m.i&&ids.has(l.a)));
+      if(l1){
+        const other = (l1.a===m.i) ? l1.b : l1.a;
+        nSub++;
+        solved.push({kind:'L1', target:m.i, use:other, note:l1.note, impact:l1.impact});
+        return;
+      }
+      // L2：烹饪功能角色等价替换
+      const roles = (ING[m.i].r||[]).filter(x=>FUNCTIONAL_ROLES.includes(x));
+      let hit = null;
+      for(const rid of ids){
+        if(rid===m.i) continue;
+        const shared = (ING[rid].r||[]).filter(x=>roles.includes(x));
+        if(shared.length){ hit = {rid, role:shared[0]}; break; }
+      }
+      if(hit){
+        nSub++;
+        solved.push({kind:'L2', target:m.i, use:hit.rid, role:hit.role,
+          note:'同样用于「'+hit.role+'」，可以顶上', impact:'略有差别'});
+        return;
+      }
+      // L3：可省略
+      if(m.req !== '必需'){
+        nOmit++;
+        solved.push({kind:'L3', target:m.i, note:'属于可选/装饰，去掉不影响成菜', impact:'几乎无感'});
+        return;
+      }
+      // 只能补货
+      const alt = L1.find(l=>l.a===m.i||l.b===m.i);
+      needBuy.push({target:m.i, alt: alt ? (alt.a===m.i?alt.b:alt.a) : null, altNote: alt?alt.note:null});
+    });
+
+    const coverage  = total ? matched.length/total : 0;
+    const effective = total ? (matched.length + nSub + nOmit)/total : 0;
+
+    // 库存利用率：这道菜到底消耗掉你冰箱里多少东西
+    const usedCount = new Set(r.ing.filter(x=>ids.has(x.i) && !ING[x.i].s).map(x=>x.i)).size;
+    const utilization = inv.length ? usedCount/inv.length : 0;
+
+    let urgency = 0;
+    r.ing.forEach(x=>{ if(ids.has(x.i) && fresh[x.i]==='快坏了') urgency++; });
+
+    return {
+      r, total, matched:matched.length, missingLines, solved, needBuy,
+      coverage, effective, utilization, usedCount, urgency,
+      score: Math.round(45*effective + 20*coverage + 25*utilization + 6*urgency),
+      free: needBuy.length===0
+    };
+  }).sort((a,b)=> b.score - a.score);
+
+  return out;
+}
+
+const IMPACT_CLS = {'几乎无感':'b-ok','略有差别':'b-warn','会改变菜品性质':'b-bad'};
+
+function render(list){
+  const box = $('res'); box.innerHTML = '';
+  const data = list.filter(x=> !filtered || x.free);
+  $('cnt').textContent = '共 ' + data.length + ' 道';
+  if(!data.length){
+    box.innerHTML = '<div class="empty">没有符合条件的菜谱，试试添加食材或取消筛选。</div>'; return;
+  }
+
+  data.forEach((x, idx)=>{
+    const el = document.createElement('div'); el.className = 'rc';
+
+    const hd = document.createElement('div'); hd.className='hd';
+    const left = document.createElement('div');
+    const nm = document.createElement('div'); nm.className='nm'; nm.textContent = x.r.n;
+    const tg = document.createElement('div'); tg.className='tags';
+    tg.textContent = x.r.diff + ' · ' + x.r.t + '分钟 · ' + x.r.srv +
+      (x.urgency ? ' · 用掉 '+x.urgency+' 样临期' : '');
+    left.appendChild(nm); left.appendChild(tg);
+    const sc = document.createElement('div'); sc.className='sc';
+    sc.innerHTML = x.score + '<small>推荐分</small>';
+    hd.appendChild(left); hd.appendChild(sc);
+    el.appendChild(hd);
+
+    const bar = document.createElement('div'); bar.className='bar';
+    const b1 = document.createElement('i'); b1.className='b1'; b1.style.width = (x.coverage*100)+'%';
+    const b2 = document.createElement('i'); b2.className='b2'; b2.style.width = ((x.effective-x.coverage)*100)+'%';
+    bar.appendChild(b1); bar.appendChild(b2);
+    el.appendChild(bar);
+
+    const lg = document.createElement('div'); lg.className='legend';
+    lg.innerHTML = '<span>用掉你的 '+x.usedCount+'/'+inv.length+' 样</span>'+
+      '<span>菜谱已有 '+Math.round(x.coverage*100)+'%</span>'+
+      '<span>替换/省略后可做 '+Math.round(x.effective*100)+'%</span>'+
+      '<span>' + (x.free ? '<b style="color:#0F6E56">无需补货</b>' : '需补 '+x.needBuy.length+' 样') + '</span>';
+    el.appendChild(lg);
+
+    const det = document.createElement('div'); det.className='details';
+    const lines = document.createElement('div'); lines.className='lines';
+
+    x.r.ing.forEach(ing=>{
+      const has = inv.some(v=>v.i===ing.i);
+      const staple = !!ING[ing.i].s;
+      const row = document.createElement('div'); row.className='line';
+      const a = document.createElement('span');
+      a.textContent = ING[ing.i].n + ' ' + ing.q + (staple ? '（常备）' : '');
+      const b = document.createElement('span'); b.className='badge';
+      if(has){ b.className += ' b-ok'; b.textContent = '已有'; }
+      else{
+        const s = x.solved.find(v=>v.target===ing.i);
+        if(s){
+          if(s.kind==='L1'){ b.className += ' b-info'; b.textContent = '可用你已有的' + ING[s.use].n + '替代'; }
+          else if(s.kind==='L2'){ b.className += ' b-info'; b.textContent = '可用你已有的' + ING[s.use].n + '替代'; }
+          else { b.className += ' b-gray'; b.textContent = '可省略'; }
+        }else if(x.needBuy.find(v=>v.target===ing.i)){
+          b.className += ' b-bad'; b.textContent = '需补货';
+        }else{ b.className += ' b-gray'; b.textContent = '可选'; }
+      }
+      row.appendChild(a); row.appendChild(b); lines.appendChild(row);
+
+      const s = x.solved.find(v=>v.target===ing.i);
+      if(s){
+        const nt = document.createElement('div'); nt.className='note';
+        const ib = document.createElement('span');
+        ib.className = 'badge ' + (IMPACT_CLS[s.impact]||'b-gray');
+        ib.textContent = s.impact;
+        nt.appendChild(ib);
+        nt.appendChild(document.createTextNode(' ' + s.note));
+        const holder = document.createElement('div'); holder.style.margin='0 0 6px';
+        holder.appendChild(nt); lines.appendChild(holder);
+      }
+      const nb = x.needBuy.find(v=>v.target===ing.i);
+      if(nb && nb.alt){
+        const nt = document.createElement('div'); nt.className='note';
+        nt.textContent = '买不到的话，也可以用' + ING[nb.alt].n + '：' + nb.altNote;
+        const holder = document.createElement('div'); holder.style.margin='0 0 6px';
+        holder.appendChild(nt); lines.appendChild(holder);
+      }
+    });
+    det.appendChild(lines);
+
+    const ol = document.createElement('ol'); ol.className='steps';
+    x.r.steps.forEach(s=>{ const li=document.createElement('li'); li.textContent=s; ol.appendChild(li); });
+    det.appendChild(ol);
+    el.appendChild(det);
+
+    const more = document.createElement('button');
+    more.className='sm'; more.style.marginTop='10px'; more.textContent='看做法与替换明细';
+    more.onclick = ()=>{
+      det.classList.toggle('on');
+      more.textContent = det.classList.contains('on') ? '收起' : '看做法与替换明细';
+    };
+    el.appendChild(more);
+
+    box.appendChild(el);
+  });
+}
+
+function run(){ render(analyze()); }
+
+$('fAll').onclick = ()=>{ filtered=false; run(); };
+$('fFree').onclick = ()=>{ filtered=true; run(); };
+
+fillAddSel(); renderInv();
+</script>
+</body>
+</html>
