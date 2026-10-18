@@ -57,9 +57,7 @@
           if(error)throw error;
           if(!data.session)throw new Error('未获取到登录会话，请重试。');
           document.getElementById('password').value='';
-          show('登录成功，Supabase 已建立会话！下一步接入 /dashboard 页面和访问保护。','success');
-          button.textContent='登录成功';
-          return;
+          window.location.replace('/dashboard');
         } catch(e) {
           show(e?.message==='Invalid login credentials'?'邮箱或密码不正确，请检查后重试。':'登录失败：'+(e?.message||'未知错误'),'error');
         } finally {
