@@ -1,503 +1,90 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>清冰箱 · 食材识别菜谱推荐 Demo</title>
-<style>
-:root{
-  --bg:#F7F7F5; --card:#FFFFFF; --line:#E5E3DC; --line2:#D3D1C7;
-  --tx:#2C2C2A; --tx2:#5F5E5A; --tx3:#888780;
-  --ok:#0F6E56; --ok-bg:#E1F5EE; --warn:#854F0B; --warn-bg:#FAEEDA;
-  --bad:#A32D2D; --bad-bg:#FCEBEB; --info:#185FA5; --info-bg:#E6F1FB;
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#345b44"><title>好好吃饭 · AI 冰箱食谱 Demo</title><style>:root{--bg:#f7f7ef;--paper:#fffefb;--sage:#345b44;--deep:#213f32;--mint:#e9f0e5;--orange:#d77c45;--ink:#27362d;--muted:#748176;--line:#e7e8dd;--shadow:0 12px 40px rgba(42,67,48,.07)}*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--ink);background:var(--bg)}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.app{max-width:1280px;margin:auto;min-height:100vh;display:grid;grid-template-columns:255px minmax(0,1fr)}.side{padding:35px 23px;position:sticky;top:0;height:100vh;border-right:1px solid var(--line);background:#f5f7ef}.logo{display:flex;gap:10px;align-items:center;font-size:22px;font-weight:850;color:var(--sage);margin:10px 3px 40px}.logo-mark{background:#dbe9d6;width:42px;height:42px;display:grid;place-items:center;border-radius:14px}.nav-btn{display:flex;align-items:center;width:100%;border:0;background:transparent;text-align:left;padding:16px;border-radius:15px;color:#536558;font-weight:650;margin-bottom:9px;gap:12px}.nav-btn.active{background:var(--sage);color:white}.aside-note{margin-top:55px;padding:20px;border-radius:20px;background:#e4ebdd;line-height:1.8;font-size:13px;color:#54705a}.aside-note strong{display:block;font-size:16px;color:var(--deep)}main{padding:38px clamp(20px,4vw,62px) 100px;min-width:0}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:27px}.eyebrow{text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-size:12px;font-weight:800}.page-title{font-size:clamp(27px,3vw,37px);letter-spacing:-1px;line-height:1.22;margin:8px 0 12px;color:var(--deep)}.sub{color:var(--muted);font-size:14px;line-height:1.8;margin:0}.pill{display:inline-flex;align-items:center;gap:5px;background:var(--mint);padding:9px 14px;border-radius:40px;color:var(--sage);font-size:12px;font-weight:750}.card{background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:24px}.hero{background:linear-gradient(105deg,#dce8d8,#f0efdb);border-radius:27px;padding:34px 36px;display:flex;align-items:center;justify-content:space-between;gap:25px;margin-bottom:25px;overflow:hidden}.hero h2{font-size:27px;margin:0 0 9px;color:#28513b}.hero p{max-width:480px;color:#687969;line-height:1.8;margin:0 0 18px}.hero-emoji{font-size:90px;filter:drop-shadow(0 10px 8px #b3cbb7)}.btn{background:var(--sage);border:1px solid var(--sage);color:white;border-radius:14px;padding:13px 21px;font-weight:750;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn.secondary{background:white;color:var(--sage);border-color:#cbd8c9}.btn.ghost{background:transparent;border-color:var(--line);color:var(--sage)}.btn.warn{background:#fff0e4;border-color:#f8d6b6;color:#a25b30}.btn.small{padding:9px 12px;border-radius:11px;font-size:13px}.btn:focus-visible,.chip:focus-visible,.nav-btn:focus-visible{outline:3px solid #e1ad65;outline-offset:3px}.actions{display:flex;gap:10px;flex-wrap:wrap}.hrow{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:20px 0 14px}.hrow h3{margin:0;font-size:19px}.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}.stat{background:white;border:1px solid var(--line);border-radius:18px;padding:20px}.stat strong{font-size:30px;color:var(--deep);display:block;margin-top:8px}.stat span{color:var(--muted);font-size:13px}.ingredient-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:11px}.ing{border:1px solid var(--line);background:white;border-radius:18px;padding:15px 9px;min-height:113px;text-align:center;position:relative;transition:.15s}.ing:hover{border-color:#a2bca5;transform:translateY(-2px)}.ing.selected{background:#e9f1e5;border-color:#8eb29a}.ing .emoji{font-size:30px;display:block;margin-bottom:8px}.ing b{font-size:13px}.ing small{display:block;color:var(--muted);margin-top:5px}.ing.selected:after{content:'✓';position:absolute;right:8px;top:7px;font-size:12px;border-radius:50%;color:white;background:var(--sage);width:20px;height:20px;line-height:20px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.search{flex:1;min-width:175px;border:1px solid var(--line);border-radius:13px;background:white;padding:12px 14px;outline:none}.search:focus{border-color:var(--sage)}.chip{border:1px solid var(--line);background:white;padding:9px 14px;border-radius:25px;color:#6e7a6d;font-size:13px;font-weight:650}.chip.on{background:var(--sage);color:white;border-color:var(--sage)}.fixed-action{position:sticky;bottom:16px;background:#ffffffed;backdrop-filter:blur(10px);padding:13px;border:1px solid var(--line);border-radius:19px;box-shadow:0 8px 35px #2d503421;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:24px;z-index:10}.list-row{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid var(--line)}.list-row:last-child{border:0}.small-emoji{font-size:29px;background:#eff4e9;border-radius:12px;width:47px;height:47px;display:grid;place-items:center}.grow{flex:1;min-width:0}.grow b{display:block}.grow small{color:var(--muted);font-size:12px}.qty{display:flex;align-items:center;gap:9px}.qty button{border:1px solid var(--line);background:white;border-radius:9px;width:30px;height:30px}.qty strong{min-width:32px;text-align:center}.recipes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.recipe{padding:0;overflow:hidden;display:flex;flex-direction:column}.art{height:150px;display:flex;align-items:center;justify-content:center;font-size:70px;background:linear-gradient(130deg,#eceddb,#dcebd6)}.recipe:nth-child(2) .art{background:linear-gradient(130deg,#f6e6cf,#f7eadc)}.recipe:nth-child(3) .art{background:linear-gradient(130deg,#dce9e4,#e9efde)}.recipe-body{padding:21px;flex:1;display:flex;flex-direction:column}.recipe h3{font-size:21px;margin:9px 0 10px}.meta{color:var(--muted);font-size:12px;display:flex;gap:10px;flex-wrap:wrap}.tag{display:inline-block;background:#eaf2e5;color:#3f7055;font-size:11px;padding:6px 9px;border-radius:7px;font-weight:750}.tag.orange{background:#fff0e1;color:#a66c37}.recipe-body p{color:#65756b;font-size:13px;line-height:1.7;flex:1}.empty{padding:35px;text-align:center;background:white;border:1px dashed #b8c7b7;border-radius:22px;color:#718172}.notice{padding:14px 18px;background:#fff6e9;color:#856039;border:1px solid #f6e7d1;border-radius:13px;font-size:13px;line-height:1.7;margin:16px 0}.success{background:#e9f2e7;color:#3d6850;border-color:#d0e4d1}.section{margin:25px 0}.section h3{margin:0 0 12px}.adjust{border:1px solid #e5e7d8;background:#fbfcf5;border-radius:15px;padding:15px;margin:9px 0}.adjust b{font-size:14px}.adjust p{margin:6px 0;color:#6a786a;font-size:13px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}.settings-grid .card h3{margin:0 0 15px}.option-grid{display:flex;gap:9px;flex-wrap:wrap}.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.check{display:flex;align-items:center;gap:9px;font-size:13px}.check input{accent-color:var(--sage)}.steps{font-size:clamp(22px,3vw,34px);line-height:1.8;background:white;border-radius:20px;padding:30px;min-height:210px;display:flex;align-items:center}.progress{height:7px;border-radius:10px;background:#e7ecdf;overflow:hidden;margin:20px 0}.progress>span{display:block;height:100%;background:var(--sage);transition:.2s}.mobile-nav{display:none}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#253d30;color:white;padding:12px 22px;border-radius:12px;z-index:30;box-shadow:0 10px 30px #0002}.subtle{color:#7a897e;font-size:12px;line-height:1.8}.break{height:1px;background:var(--line);margin:18px 0}.config-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:11px 0;border-bottom:1px solid var(--line)}.timer{font-size:36px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--deep)}.mini-txt{font-size:13px;color:#637367}.feedback{display:flex;gap:12px;flex-wrap:wrap}.feedback button{min-width:110px}.narrow{max-width:820px}.cook-layout{max-width:730px;margin:auto}.demo-watermark{font-size:11px;color:#879788;margin-top:20px}.code{font-family:monospace;font-size:12px}@media(max-width:800px){.app{display:block}.side{display:none}main{padding:22px 17px 100px}.top{margin-bottom:18px}.hero{padding:22px}.hero h2{font-size:22px}.hero-emoji{font-size:55px}.stat-grid{gap:8px}.stat{padding:13px}.stat strong{font-size:24px}.ingredient-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.ing{min-height:103px}.mobile-nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:#fffefb;border-top:1px solid var(--line);padding:10px 3px max(10px,env(safe-area-inset-bottom));z-index:20}.mobile-nav button{border:0;background:transparent;display:grid;gap:4px;font-size:11px;color:#78897b;justify-items:center}.mobile-nav button.active{color:var(--sage);font-weight:850}.mobile-nav span{font-size:21px}.fixed-action{bottom:66px}.recipes{grid-template-columns:1fr}.art{height:130px}.page-title{font-size:28px}.card{padding:18px}.steps{padding:22px;min-height:190px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Visual scanner and touch-friendly interaction */
+input[type=file]{border:1px dashed #afc3ab;border-radius:15px;padding:16px;background:#f5f9f1;width:100%;font-size:14px}
+@media(max-width:800px){.mobile-nav{overflow-x:auto;gap:4px}.mobile-nav button{min-width:51px}.qty button{min-width:34px;min-height:34px}.list-row{flex-wrap:wrap}.list-row .qty{margin-left:auto}}
+</style></head><body><div id="app"></div><script>window.DEMO_DATA={"version":"demo-1.0","ingredients":[{"n":"番茄","c":"蔬菜","u":"count","a":[],"aliases":["西红柿"],"ref":1},{"n":"黄瓜","c":"蔬菜","u":"count","a":[],"aliases":[],"ref":1},{"n":"土豆","c":"蔬菜","u":"count","a":[],"aliases":["马铃薯"],"ref":1},{"n":"胡萝卜","c":"蔬菜","u":"count","a":[],"aliases":[],"ref":1},{"n":"洋葱","c":"蔬菜","u":"count","a":[],"aliases":[],"ref":1},{"n":"青椒","c":"蔬菜","u":"count","a":[],"aliases":["柿子椒"],"ref":1},{"n":"红椒","c":"蔬菜","u":"count","a":[],"aliases":[],"ref":1},{"n":"菠菜","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"生菜","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"油麦菜","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"小白菜","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"西兰花","c":"蔬菜","u":"meal","a":[],"aliases":["绿花椰菜"],"ref":1},{"n":"花菜","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"包菜","c":"蔬菜","u":"meal","a":[],"aliases":["卷心菜"],"ref":1},{"n":"茄子","c":"蔬菜","u":"count","a":[],"aliases":[],"ref":1},{"n":"西葫芦","c":"蔬菜","u":"count","a":[],"aliases":[],"ref":1},{"n":"南瓜","c":"蔬菜","u":"count","a":[],"aliases":[],"ref":1},{"n":"蘑菇","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"香菇","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"金针菇","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"芹菜","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"豆芽","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"韭菜","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"冬瓜","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"莲藕","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"秋葵","c":"蔬菜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"玉米","c":"蔬菜","u":"count","a":[],"aliases":[],"ref":1},{"n":"鸡蛋","c":"蛋奶豆","u":"count","a":["蛋类"],"aliases":["蛋"],"ref":1},{"n":"豆腐","c":"蛋奶豆","u":"meal","a":["大豆"],"aliases":[],"ref":1},{"n":"嫩豆腐","c":"蛋奶豆","u":"meal","a":["大豆"],"aliases":["内酯豆腐"],"ref":1},{"n":"千张","c":"蛋奶豆","u":"meal","a":["大豆"],"aliases":[],"ref":1},{"n":"牛奶","c":"蛋奶豆","u":"meal","a":["乳制品"],"aliases":[],"ref":1},{"n":"酸奶","c":"蛋奶豆","u":"meal","a":["乳制品"],"aliases":[],"ref":1},{"n":"芝士","c":"蛋奶豆","u":"meal","a":["乳制品"],"aliases":[],"ref":1},{"n":"黄油","c":"蛋奶豆","u":"meal","a":["乳制品"],"aliases":[],"ref":1},{"n":"鸡胸肉","c":"肉禽海鲜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"鸡腿肉","c":"肉禽海鲜","u":"count","a":[],"aliases":[],"ref":1},{"n":"猪肉","c":"肉禽海鲜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"猪里脊","c":"肉禽海鲜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"牛肉","c":"肉禽海鲜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"牛肉末","c":"肉禽海鲜","u":"meal","a":[],"aliases":["牛肉馅"],"ref":1},{"n":"虾仁","c":"肉禽海鲜","u":"meal","a":["甲壳类"],"aliases":[],"ref":1},{"n":"鱼片","c":"肉禽海鲜","u":"meal","a":["鱼类"],"aliases":[],"ref":1},{"n":"三文鱼","c":"肉禽海鲜","u":"meal","a":["鱼类"],"aliases":[],"ref":1},{"n":"培根","c":"肉禽海鲜","u":"meal","a":[],"aliases":[],"ref":1},{"n":"火腿","c":"肉禽海鲜","u":"count","a":[],"aliases":[],"ref":1},{"n":"香肠","c":"肉禽海鲜","u":"count","a":[],"aliases":[],"ref":1},{"n":"米饭","c":"主食","u":"meal","a":[],"aliases":["剩饭"],"ref":1},{"n":"大米","c":"主食","u":"meal","a":[],"aliases":[],"ref":1},{"n":"面条","c":"主食","u":"meal","a":["麸质"],"aliases":[],"ref":1},{"n":"意大利面","c":"主食","u":"meal","a":["麸质"],"aliases":["意面"],"ref":1},{"n":"吐司","c":"主食","u":"count","a":["麸质"],"aliases":["土司"],"ref":1},{"n":"面包","c":"主食","u":"count","a":["麸质"],"aliases":[],"ref":1},{"n":"馒头","c":"主食","u":"count","a":["麸质"],"aliases":[],"ref":1},{"n":"燕麦","c":"主食","u":"meal","a":["麸质"],"aliases":[],"ref":1},{"n":"土司片","c":"主食","u":"count","a":["麸质"],"aliases":[],"ref":1},{"n":"粉丝","c":"主食","u":"meal","a":[],"aliases":[],"ref":1},{"n":"年糕","c":"主食","u":"meal","a":[],"aliases":[],"ref":1},{"n":"苹果","c":"水果坚果","u":"count","a":[],"aliases":[],"ref":1},{"n":"香蕉","c":"水果坚果","u":"count","a":[],"aliases":[],"ref":1},{"n":"柠檬","c":"水果坚果","u":"count","a":[],"aliases":[],"ref":1},{"n":"牛油果","c":"水果坚果","u":"count","a":[],"aliases":[],"ref":1},{"n":"花生","c":"水果坚果","u":"meal","a":["花生"],"aliases":[],"ref":1},{"n":"核桃","c":"水果坚果","u":"meal","a":["坚果"],"aliases":[],"ref":1},{"n":"芝麻","c":"水果坚果","u":"meal","a":["芝麻"],"aliases":[],"ref":1},{"n":"盐","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"食用油","c":"调料","u":"boolean","a":[],"aliases":["油"],"ref":1},{"n":"生抽","c":"调料","u":"boolean","a":["大豆","麸质"],"aliases":["酱油"],"ref":1},{"n":"老抽","c":"调料","u":"boolean","a":["大豆","麸质"],"aliases":[],"ref":1},{"n":"糖","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"醋","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"料酒","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"蚝油","c":"调料","u":"boolean","a":["贝类"],"aliases":[],"ref":1},{"n":"淀粉","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"白胡椒","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"黑胡椒","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"橄榄油","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"葱","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"姜","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"蒜","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"豆瓣酱","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"咖喱块","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"番茄酱","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"辣椒粉","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"孜然","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"蜂蜜","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"罗勒","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"香草","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"鱼露","c":"调料","u":"boolean","a":["鱼类"],"aliases":[],"ref":1},{"n":"花椒","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"辣椒","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"芥末","c":"调料","u":"boolean","a":[],"aliases":[],"ref":1},{"n":"蛋黄酱","c":"调料","u":"boolean","a":["蛋类"],"aliases":[],"ref":1}],"recipes":[{"id":1,"n":"番茄炒蛋","cu":"中","t":12,"active":9,"tool":"炒锅","main":["番茄","鸡蛋"],"side":["葱"],"sp":["盐","食用油","糖"],"veg":true,"parallel":false,"heat":0,"steps":["番茄切块，鸡蛋打散","热锅加油，炒散鸡蛋盛出","番茄炒软出汁，倒回鸡蛋","加盐调味，出锅"]},{"id":2,"n":"青椒土豆丝","cu":"中","t":18,"active":14,"tool":"炒锅","main":["土豆","青椒"],"side":["蒜"],"sp":["盐","食用油","醋"],"veg":true,"parallel":false,"heat":1,"steps":["土豆切细丝并冲去淀粉","青椒切丝，蒜切碎","热油炒香蒜，加土豆丝翻炒","加入青椒和调料，炒熟出锅"]},{"id":3,"n":"蒜蓉西兰花","cu":"中","t":13,"active":8,"tool":"炒锅","main":["西兰花"],"side":["蒜"],"sp":["盐","食用油","蚝油"],"veg":true,"parallel":true,"heat":0,"steps":["西兰花切小朵洗净","沸水焯熟捞出","热油炒香蒜末","加入西兰花和调料翻匀"]},{"id":4,"n":"黄瓜炒鸡蛋","cu":"中","t":12,"active":9,"tool":"炒锅","main":["黄瓜","鸡蛋"],"side":["葱"],"sp":["盐","食用油"],"veg":true,"parallel":false,"heat":0,"steps":["黄瓜切片，鸡蛋打散","炒熟鸡蛋盛出","黄瓜翻炒至断生","倒回鸡蛋调味"]},{"id":5,"n":"醋溜白菜","cu":"中","t":15,"active":10,"tool":"炒锅","main":["包菜"],"side":["蒜"],"sp":["盐","食用油","醋","糖"],"veg":true,"parallel":false,"heat":0,"steps":["包菜撕片洗净","蒜切末","热油快炒包菜","调入醋盐和糖，炒熟"]},{"id":6,"n":"蘑菇炒蛋","cu":"中","t":15,"active":11,"tool":"炒锅","main":["蘑菇","鸡蛋"],"side":["葱"],"sp":["盐","食用油","黑胡椒"],"veg":true,"parallel":false,"heat":0,"steps":["蘑菇切片，鸡蛋打散","鸡蛋炒熟盛出","蘑菇炒软至水分减少","倒回鸡蛋，调味"]},{"id":7,"n":"家常豆腐","cu":"中","t":20,"active":14,"tool":"炒锅","main":["豆腐","青椒"],"side":["蒜"],"sp":["盐","食用油","生抽","淀粉"],"veg":true,"parallel":false,"heat":1,"steps":["豆腐切块，青椒切片","锅中放油把豆腐两面煎定型","加入青椒和蒜末炒熟","加调料和少量水稍煮"]},{"id":8,"n":"清炒菠菜","cu":"中","t":10,"active":7,"tool":"炒锅","main":["菠菜"],"side":["蒜"],"sp":["盐","食用油"],"veg":true,"parallel":true,"heat":0,"steps":["菠菜洗净沥水","蒜切末","热锅少油炒蒜末","加入菠菜炒熟，加盐"]},{"id":9,"n":"洋葱炒蛋","cu":"中","t":13,"active":10,"tool":"炒锅","main":["洋葱","鸡蛋"],"side":["葱"],"sp":["盐","食用油"],"veg":true,"parallel":false,"heat":0,"steps":["洋葱切丝，鸡蛋打散","炒熟鸡蛋盛出","洋葱炒软","倒回鸡蛋翻匀调味"]},{"id":10,"n":"胡萝卜炒肉","cu":"中","t":20,"active":15,"tool":"炒锅","main":["胡萝卜","猪肉"],"side":["姜"],"sp":["盐","食用油","生抽","料酒"],"veg":false,"parallel":false,"heat":0,"steps":["猪肉切薄片，胡萝卜切片","锅中热油，下肉片炒至完全熟透","加入胡萝卜炒软","加入调料炒匀"]},{"id":11,"n":"青椒肉丝","cu":"中","t":18,"active":14,"tool":"炒锅","main":["猪里脊","青椒"],"side":["姜"],"sp":["食用油","生抽","盐","淀粉"],"veg":false,"parallel":false,"heat":1,"steps":["里脊切丝，青椒切丝","肉丝加入少量淀粉和生抽拌匀","热油把肉丝炒至熟透","加入青椒炒熟，调味"]},{"id":12,"n":"番茄豆腐汤","cu":"中","t":18,"active":9,"tool":"炒锅","main":["番茄","嫩豆腐"],"side":["葱"],"sp":["盐","食用油","白胡椒"],"veg":true,"parallel":true,"heat":0,"steps":["番茄切块，豆腐切块","锅中少油炒软番茄","加入水煮沸，再下豆腐煮熟","加盐和胡椒调味"]},{"id":13,"n":"紫菜蛋花汤","cu":"中","t":10,"active":6,"tool":"炒锅","main":["鸡蛋"],"side":["葱"],"sp":["盐","香草"],"veg":true,"parallel":true,"heat":0,"steps":["鸡蛋打散","锅中加水煮沸","缓缓倒入蛋液并搅拌","加盐调味，撒葱花"]},{"id":14,"n":"土豆炖鸡块","cu":"中","t":28,"active":15,"tool":"炒锅","main":["鸡腿肉","土豆"],"side":["姜"],"sp":["食用油","生抽","盐","料酒"],"veg":false,"parallel":true,"heat":0,"steps":["鸡肉切小块，土豆切块","鸡肉下锅煎炒到表面变色","加入土豆、热水和调料","加盖煮至鸡肉中心完全熟透、土豆软烂"]},{"id":15,"n":"香菇鸡肉饭","cu":"中","t":28,"active":13,"tool":"电饭煲","main":["大米","鸡胸肉"],"side":["香菇","胡萝卜"],"sp":["生抽","食用油","盐"],"veg":false,"parallel":true,"heat":0,"steps":["大米洗净，加适量水","鸡肉切小块，香菇胡萝卜切丁","把食材和调料放进电饭煲","启动快煮模式，结束检查鸡肉完全熟透"]},{"id":16,"n":"蛋炒饭","cu":"中","t":12,"active":10,"tool":"炒锅","main":["米饭","鸡蛋"],"side":["胡萝卜","葱"],"sp":["盐","食用油","生抽"],"veg":true,"parallel":false,"heat":0,"steps":["鸡蛋打散，胡萝卜切丁","锅中热油炒熟鸡蛋","加入米饭和胡萝卜炒热炒熟","加调料和葱花翻匀"]},{"id":17,"n":"番茄鸡蛋面","cu":"中","t":18,"active":13,"tool":"炒锅","main":["面条","番茄","鸡蛋"],"side":["葱"],"sp":["盐","食用油","生抽"],"veg":true,"parallel":false,"heat":0,"steps":["番茄切块，鸡蛋打散","鸡蛋炒熟盛出，再炒软番茄","加水煮沸，放面条煮熟","加入鸡蛋调味"]},{"id":18,"n":"酸辣土豆片","cu":"中","t":15,"active":11,"tool":"炒锅","main":["土豆"],"side":["辣椒","蒜"],"sp":["盐","食用油","醋"],"veg":true,"parallel":false,"heat":2,"steps":["土豆切薄片冲洗","蒜辣椒切碎","热油下土豆片炒到完全熟透","加入蒜辣椒和醋调味"]},{"id":19,"n":"西葫芦炒蛋","cu":"中","t":14,"active":10,"tool":"炒锅","main":["西葫芦","鸡蛋"],"side":["蒜"],"sp":["盐","食用油"],"veg":true,"parallel":false,"heat":0,"steps":["西葫芦切片，鸡蛋打散","炒熟鸡蛋盛出","西葫芦炒软熟透","倒回鸡蛋调味"]},{"id":20,"n":"芹菜炒香干","cu":"中","t":18,"active":13,"tool":"炒锅","main":["芹菜","千张"],"side":["姜"],"sp":["食用油","生抽","盐"],"veg":true,"parallel":false,"heat":0,"steps":["芹菜切段，千张切条","千张焯烫后沥干","热油炒芹菜至熟","加入千张和调味料炒匀"]},{"id":21,"n":"清炒豆芽","cu":"中","t":10,"active":8,"tool":"炒锅","main":["豆芽"],"side":["葱"],"sp":["盐","食用油","醋"],"veg":true,"parallel":false,"heat":0,"steps":["豆芽清洗干净","热锅放油炒香葱","放豆芽快速翻炒至熟透","加盐与醋调味"]},{"id":22,"n":"葱油拌面","cu":"中","t":13,"active":10,"tool":"炒锅","main":["面条"],"side":["葱"],"sp":["食用油","生抽","糖"],"veg":true,"parallel":false,"heat":0,"steps":["面条煮熟沥水","葱切段低温煸出香味","加入生抽和少量糖","用葱油拌匀面条"]},{"id":23,"n":"麻婆风味豆腐","cu":"中","t":18,"active":12,"tool":"炒锅","main":["豆腐"],"side":["葱","蒜"],"sp":["豆瓣酱","食用油","淀粉"],"veg":true,"parallel":false,"heat":2,"steps":["豆腐切小块","少量油炒香豆瓣酱","下豆腐加水煮透","少量淀粉水勾芡，撒葱花"]},{"id":24,"n":"冬瓜汤","cu":"中","t":18,"active":8,"tool":"炒锅","main":["冬瓜"],"side":["姜"],"sp":["盐","白胡椒"],"veg":true,"parallel":true,"heat":0,"steps":["冬瓜去皮切片","锅中水烧开加入冬瓜","加姜煮至冬瓜透明软熟","盐和胡椒调味"]},{"id":25,"n":"茄子炒肉末","cu":"中","t":22,"active":16,"tool":"炒锅","main":["茄子","猪肉"],"side":["蒜"],"sp":["食用油","生抽","盐"],"veg":false,"parallel":false,"heat":1,"steps":["茄子切条，猪肉剁碎","肉末下锅炒至完全熟透","加入茄子少量水焖软","加入蒜和调料炒匀"]},{"id":26,"n":"青椒炒香肠","cu":"中","t":15,"active":12,"tool":"炒锅","main":["青椒","香肠"],"side":["洋葱"],"sp":["食用油","生抽"],"veg":false,"parallel":false,"heat":1,"steps":["青椒切块，香肠切片","热锅少油炒香肠至熟透","加洋葱和青椒炒熟","加少量生抽调味"]},{"id":27,"n":"玉米鸡蛋羹","cu":"中","t":20,"active":8,"tool":"电饭煲","main":["鸡蛋","玉米"],"side":["葱"],"sp":["盐","香草"],"veg":true,"parallel":true,"heat":0,"steps":["玉米粒煮熟","鸡蛋加温水打匀","加入玉米粒并盖上耐热盖","用蒸煮模式蒸至蛋液完全凝固"]},{"id":28,"n":"土豆胡萝卜焖饭","cu":"中","t":29,"active":12,"tool":"电饭煲","main":["大米","土豆"],"side":["胡萝卜"],"sp":["盐","生抽","食用油"],"veg":true,"parallel":true,"heat":0,"steps":["大米淘洗后加水","土豆和胡萝卜切小丁","与调料一起加入锅中","启动快煮模式至食材熟透"]},{"id":29,"n":"虾仁炒蛋","cu":"中","t":13,"active":11,"tool":"炒锅","main":["虾仁","鸡蛋"],"side":["葱"],"sp":["盐","食用油","料酒"],"veg":false,"parallel":false,"heat":0,"steps":["虾仁解冻并沥干，鸡蛋打散","热油先炒虾仁至完全熟透","加入蛋液炒至凝固","撒葱花、盐调味"]},{"id":30,"n":"香菇青菜","cu":"中","t":14,"active":10,"tool":"炒锅","main":["香菇","小白菜"],"side":["蒜"],"sp":["盐","食用油","蚝油"],"veg":true,"parallel":false,"heat":0,"steps":["香菇切片、青菜洗净","热锅炒香蒜片","香菇炒软再加青菜","炒熟后调味"]},{"id":31,"n":"番茄意面","cu":"西","t":22,"active":15,"tool":"炒锅","main":["意大利面","番茄"],"side":["洋葱","蒜"],"sp":["橄榄油","盐","黑胡椒"],"veg":true,"parallel":false,"heat":0,"steps":["意面按包装煮熟","番茄切丁洋葱蒜切碎","橄榄油炒香洋葱蒜，加番茄煮软","与意面混合、加盐胡椒"]},{"id":32,"n":"蘑菇奶油意面","cu":"西","t":23,"active":16,"tool":"炒锅","main":["意大利面","蘑菇"],"side":["洋葱"],"sp":["牛奶","黄油","黑胡椒"],"veg":true,"parallel":false,"heat":0,"steps":["意面煮熟备用","蘑菇洋葱切片","黄油炒蘑菇洋葱至软","加牛奶略收浓，拌入意面"]},{"id":33,"n":"蒜香鸡胸肉","cu":"西","t":18,"active":12,"tool":"炒锅","main":["鸡胸肉"],"side":["蒜"],"sp":["橄榄油","盐","黑胡椒"],"veg":false,"parallel":false,"heat":0,"steps":["鸡胸肉切成均匀薄片","两面撒盐胡椒","热油下锅煎至两面金黄","确保肉中心完全熟透，再出锅"]},{"id":34,"n":"鸡肉蔬菜沙拉","cu":"西","t":22,"active":16,"tool":"炒锅","main":["鸡胸肉","生菜"],"side":["番茄","黄瓜"],"sp":["橄榄油","醋","盐"],"veg":false,"parallel":false,"heat":0,"steps":["鸡肉煎熟且中心完全熟透，放凉","生菜番茄黄瓜洗净切好","把鸡肉切片铺到蔬菜上","拌入橄榄油和醋"]},{"id":35,"n":"牛油果鸡蛋吐司","cu":"西","t":12,"active":10,"tool":"炒锅","main":["吐司","牛油果","鸡蛋"],"side":["番茄"],"sp":["盐","黑胡椒"],"veg":true,"parallel":false,"heat":0,"steps":["吐司烘热","牛油果压泥并调味","鸡蛋煎至完全凝固","把牛油果鸡蛋放到吐司上"]},{"id":36,"n":"芝士蘑菇吐司","cu":"西","t":15,"active":9,"tool":"空气炸锅","main":["吐司","蘑菇"],"side":["洋葱"],"sp":["芝士","黑胡椒"],"veg":true,"parallel":true,"heat":0,"steps":["蘑菇洋葱切薄片并炒去多余水分","铺到吐司上撒芝士","空气炸锅160度加热6至8分钟","确认芝士融化食材熟透"]},{"id":37,"n":"土豆泥","cu":"西","t":20,"active":10,"tool":"炒锅","main":["土豆"],"side":["葱"],"sp":["牛奶","黄油","盐"],"veg":true,"parallel":true,"heat":0,"steps":["土豆切小块煮到软烂","沥去水分压成泥","加入少许牛奶黄油","拌匀加盐调味"]},{"id":38,"n":"煎三文鱼","cu":"西","t":17,"active":12,"tool":"炒锅","main":["三文鱼"],"side":["柠檬"],"sp":["橄榄油","盐","黑胡椒"],"veg":false,"parallel":false,"heat":0,"steps":["三文鱼擦干水分","撒盐胡椒","热油煎至中心熟透","挤少许柠檬汁"]},{"id":39,"n":"鸡蛋生菜三明治","cu":"西","t":15,"active":12,"tool":"炒锅","main":["吐司","鸡蛋","生菜"],"side":["番茄"],"sp":["蛋黄酱","盐"],"veg":true,"parallel":false,"heat":0,"steps":["鸡蛋煮至熟透并切片","生菜番茄洗净沥干","吐司轻烘","夹入鸡蛋蔬菜和调味酱"]},{"id":40,"n":"香蕉燕麦碗","cu":"西","t":8,"active":7,"tool":"炒锅","main":["香蕉","燕麦"],"side":["苹果"],"sp":["牛奶","蜂蜜"],"veg":true,"parallel":true,"heat":0,"steps":["燕麦加牛奶煮到熟软","香蕉切片苹果切丁","把水果放在燕麦上","按喜好加入少量蜂蜜"]},{"id":41,"n":"番茄烘蛋","cu":"西","t":18,"active":11,"tool":"炒锅","main":["鸡蛋","番茄"],"side":["洋葱"],"sp":["橄榄油","盐","黑胡椒"],"veg":true,"parallel":true,"heat":0,"steps":["洋葱番茄切碎","锅中炒软番茄洋葱","倒入打散的蛋液并加盖","小火加热至蛋液完全凝固"]},{"id":42,"n":"洋葱炒牛肉","cu":"西","t":18,"active":13,"tool":"炒锅","main":["牛肉","洋葱"],"side":["青椒"],"sp":["橄榄油","盐","黑胡椒"],"veg":false,"parallel":false,"heat":0,"steps":["牛肉切薄片，洋葱切丝","热油炒牛肉至熟透","加入洋葱青椒炒软","加盐胡椒调味"]},{"id":43,"n":"蒜香虾仁意面","cu":"西","t":22,"active":15,"tool":"炒锅","main":["虾仁","意大利面"],"side":["蒜"],"sp":["橄榄油","盐","黑胡椒"],"veg":false,"parallel":false,"heat":0,"steps":["意面煮熟","虾仁解冻、蒜切碎","热油炒蒜和虾仁至熟透","倒入面条和调料翻匀"]},{"id":44,"n":"鸡肉蔬菜空气炸锅餐","cu":"西","t":26,"active":13,"tool":"空气炸锅","main":["鸡胸肉","土豆"],"side":["胡萝卜"],"sp":["橄榄油","盐","黑胡椒"],"veg":false,"parallel":true,"heat":0,"steps":["鸡肉切小块，土豆胡萝卜切小块","拌油盐黑胡椒","空气炸锅180度分批加热并翻面","检查鸡肉中心完全熟透和蔬菜熟透"]},{"id":45,"n":"香烤西兰花","cu":"西","t":16,"active":7,"tool":"空气炸锅","main":["西兰花"],"side":["蒜"],"sp":["橄榄油","盐","黑胡椒"],"veg":true,"parallel":true,"heat":0,"steps":["西兰花切小朵洗净沥干","加少量油盐拌匀","空气炸锅180度加热约10分钟","检查熟度并调味"]},{"id":46,"n":"牛油果番茄沙拉","cu":"西","t":10,"active":9,"tool":"无","main":["牛油果","番茄"],"side":["生菜"],"sp":["橄榄油","柠檬","盐"],"veg":true,"parallel":true,"heat":0,"steps":["蔬菜洗净","牛油果番茄切块","拌入生菜","淋油、柠檬汁加盐"]},{"id":47,"n":"奶香玉米浓汤","cu":"西","t":22,"active":12,"tool":"炒锅","main":["玉米","牛奶"],"side":["土豆"],"sp":["黄油","盐","黑胡椒"],"veg":true,"parallel":true,"heat":0,"steps":["玉米粒和土豆切小块煮熟","压碎部分玉米土豆增稠","加牛奶小火加热至热透","加盐和胡椒调味"]},{"id":48,"n":"培根蘑菇意面","cu":"西","t":22,"active":16,"tool":"炒锅","main":["培根","意大利面"],"side":["蘑菇"],"sp":["橄榄油","黑胡椒","盐"],"veg":false,"parallel":false,"heat":0,"steps":["意面煮熟沥水","培根切片炒至熟透","下蘑菇炒熟","拌入意面加盐胡椒"]},{"id":49,"n":"煎蛋芝士吐司","cu":"西","t":13,"active":9,"tool":"炒锅","main":["鸡蛋","吐司"],"side":["番茄"],"sp":["芝士","盐"],"veg":true,"parallel":false,"heat":0,"steps":["吐司烘热","鸡蛋煎至全熟","铺上芝士至融化","将鸡蛋芝士夹入吐司"]},{"id":50,"n":"番茄炒牛肉末","cu":"西","t":20,"active":14,"tool":"炒锅","main":["牛肉末","番茄"],"side":["洋葱"],"sp":["橄榄油","盐","黑胡椒"],"veg":false,"parallel":false,"heat":0,"steps":["番茄洋葱切丁","牛肉末炒散至完全熟透","加入番茄洋葱炒软","加盐和胡椒调味"]}],"rules":[{"id":1,"target":"食用油","sub":"橄榄油","ctx":"炒制","impact":"几乎无影响","enabled":true},{"id":2,"target":"橄榄油","sub":"食用油","ctx":"炒制","impact":"风味有变化","enabled":true},{"id":3,"target":"生抽","sub":"盐","ctx":"咸味","impact":"风味有变化","enabled":true},{"id":4,"target":"老抽","sub":"生抽","ctx":"上色","impact":"风味有变化","enabled":true},{"id":5,"target":"醋","sub":"柠檬","ctx":"酸味","impact":"风味有变化","enabled":true},{"id":6,"target":"柠檬","sub":"醋","ctx":"酸味","impact":"风味有变化","enabled":true},{"id":7,"target":"白胡椒","sub":"黑胡椒","ctx":"胡椒调味","impact":"风味有变化","enabled":true},{"id":8,"target":"黑胡椒","sub":"白胡椒","ctx":"胡椒调味","impact":"风味有变化","enabled":true},{"id":9,"target":"黄油","sub":"橄榄油","ctx":"油脂","impact":"风味有变化","enabled":true},{"id":10,"target":"黄油","sub":"食用油","ctx":"油脂","impact":"风味有变化","enabled":true},{"id":11,"target":"橄榄油","sub":"黄油","ctx":"油脂","impact":"风味有变化","enabled":true},{"id":12,"target":"牛奶","sub":"酸奶","ctx":"奶香酱汁","impact":"口感有变化","enabled":false},{"id":13,"target":"糖","sub":"蜂蜜","ctx":"甜味","impact":"风味有变化","enabled":true},{"id":14,"target":"蜂蜜","sub":"糖","ctx":"甜味","impact":"风味有变化","enabled":true},{"id":15,"target":"葱","sub":"洋葱","ctx":"增香","impact":"风味有变化","enabled":true},{"id":16,"target":"洋葱","sub":"葱","ctx":"增香","impact":"风味有变化","enabled":true},{"id":17,"target":"蒜","sub":"葱","ctx":"香气","impact":"风味有变化","enabled":true},{"id":18,"target":"蒜","sub":"洋葱","ctx":"香气","impact":"风味有变化","enabled":true},{"id":19,"target":"姜","sub":"葱","ctx":"去腥","impact":"风味有变化","enabled":false},{"id":20,"target":"蚝油","sub":"生抽","ctx":"咸鲜","impact":"风味有变化","enabled":true},{"id":21,"target":"料酒","sub":"姜","ctx":"去腥","impact":"风味有变化","enabled":true},{"id":22,"target":"淀粉","sub":"土豆","ctx":"增稠","impact":"口感有变化","enabled":false},{"id":23,"target":"番茄酱","sub":"番茄","ctx":"番茄风味","impact":"口感有变化","enabled":false},{"id":24,"target":"豆瓣酱","sub":"辣椒粉","ctx":"辣味","impact":"风味有变化","enabled":false},{"id":25,"target":"辣椒粉","sub":"辣椒","ctx":"辣味","impact":"风味有变化","enabled":true},{"id":26,"target":"辣椒","sub":"辣椒粉","ctx":"辣味","impact":"风味有变化","enabled":true},{"id":27,"target":"罗勒","sub":"香草","ctx":"香气","impact":"风味有变化","enabled":true},{"id":28,"target":"香草","sub":"罗勒","ctx":"香气","impact":"风味有变化","enabled":true},{"id":29,"target":"孜然","sub":"黑胡椒","ctx":"香料","impact":"风味有变化","enabled":true},{"id":30,"target":"花椒","sub":"黑胡椒","ctx":"香料","impact":"风味有变化","enabled":true},{"id":31,"target":"蛋黄酱","sub":"酸奶","ctx":"湿润酱汁","impact":"风味有变化","enabled":true},{"id":32,"target":"芝士","sub":"黄油","ctx":"奶香","impact":"口感有变化","enabled":false},{"id":33,"target":"白胡椒","sub":"花椒","ctx":"香辛","impact":"风味有变化","enabled":false},{"id":34,"target":"葱","sub":"蒜","ctx":"增香","impact":"风味有变化","enabled":true},{"id":35,"target":"姜","sub":"蒜","ctx":"增香","impact":"风味有变化","enabled":false},{"id":36,"target":"蚝油","sub":"盐","ctx":"咸味","impact":"风味有变化","enabled":false},{"id":37,"target":"生抽","sub":"老抽","ctx":"咸味","impact":"风味有变化","enabled":true},{"id":38,"target":"盐","sub":"生抽","ctx":"咸味","impact":"风味有变化","enabled":false},{"id":39,"target":"醋","sub":"酸奶","ctx":"酸味","impact":"风味有变化","enabled":true},{"id":40,"target":"牛奶","sub":"黄油","ctx":"奶味","impact":"口感有变化","enabled":false},{"id":41,"target":"淀粉","sub":"面粉","ctx":"勾芡","impact":"口感有变化","enabled":false},{"id":42,"target":"番茄酱","sub":"生抽","ctx":"复合调味","impact":"风味有变化","enabled":false},{"id":43,"target":"料酒","sub":"柠檬","ctx":"去腥","impact":"风味有变化","enabled":true},{"id":44,"target":"罗勒","sub":"葱","ctx":"增香","impact":"风味有变化","enabled":true},{"id":45,"target":"咖喱块","sub":"孜然","ctx":"香辛","impact":"风味有变化","enabled":false},{"id":46,"target":"芥末","sub":"辣椒粉","ctx":"辛辣","impact":"风味有变化","enabled":false},{"id":47,"target":"鱼露","sub":"生抽","ctx":"咸鲜","impact":"风味有变化","enabled":false},{"id":48,"target":"香草","sub":"葱","ctx":"香气","impact":"风味有变化","enabled":true},{"id":49,"target":"橄榄油","sub":"牛油果","ctx":"冷拌油脂","impact":"口感有变化","enabled":false},{"id":50,"target":"蜂蜜","sub":"香蕉","ctx":"甜味","impact":"口感有变化","enabled":false}]};</script><script>const D=window.DEMO_DATA;const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const names=Object.fromEntries(D.ingredients.map(i=>[i.n,i])); const seasonNames=new Set(D.ingredients.filter(i=>i.u==='boolean').map(i=>i.n));
+const emojis={番茄:'🍅',鸡蛋:'🥚',黄瓜:'🥒',土豆:'🥔',胡萝卜:'🥕',洋葱:'🧅',青椒:'🫑',红椒:'🫑',菠菜:'🥬',生菜:'🥬',小白菜:'🥬',西兰花:'🥦',花菜:'🥦',包菜:'🥬',茄子:'🍆',南瓜:'🎃',蘑菇:'🍄',香菇:'🍄',金针菇:'🍄',玉米:'🌽',鸡胸肉:'🍗',鸡腿肉:'🍗',猪肉:'🥩',猪里脊:'🥩',牛肉:'🥩',牛肉末:'🥩',虾仁:'🦐',鱼片:'🐟',三文鱼:'🐟',米饭:'🍚',大米:'🍚',面条:'🍜',意大利面:'🍝',吐司:'🍞',面包:'🍞',牛奶:'🥛',芝士:'🧀',黄油:'🧈',豆腐:'◻️',苹果:'🍎',香蕉:'🍌',柠檬:'🍋',牛油果:'🥑',花生:'🥜',盐:'🧂',蒜:'🧄',葱:'🌱',姜:'🫚',食用油:'🫒'};
+const emoji=n=>emojis[n]||({'蔬菜':'🥬','蛋奶豆':'🥚','肉禽海鲜':'🥩','主食':'🍚','水果坚果':'🍎','调料':'🧂'}[names[n]?.c]||'🍽️');
+const KEY='fridge_demo_20261018_v1';let saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch{};
+let state={page:'home',category:'全部',search:'',recipe:null,result:null,recipeStep:0,timerSec:0,timerRunning:false,timerTick:0,showOriginal:false,pendingDeduction:null,seed:saved.seed!==false,inventory:saved.inventory||{'鸡蛋':3,'番茄':2,'土豆':2,'青椒':1,'米饭':1,'胡萝卜':1,'洋葱':1,'鸡胸肉':1,'西兰花':1,'生菜':1},prefs:{cu:'都做',tool:['炒锅','电饭煲','空气炸锅'],allergy:[],avoid:[],vegetarian:false,heat:1,...saved.prefs},pantrySearch:'',feedback:saved.feedback||[],rejects:saved.rejects||[],events:saved.events||[],scanItems:[],scanBusy:false,scanError:'',scanImage:'',apiBase:saved.apiBase||''};
+const defaultSeason=['盐','食用油','生抽','老抽','糖','醋','料酒','蚝油','淀粉','白胡椒','黑胡椒','橄榄油','葱','姜','蒜'];state.season=saved.season||Object.fromEntries(D.ingredients.filter(x=>x.u==='boolean').map(x=>[x.n,defaultSeason.includes(x.n)]));
+function persist(){localStorage.setItem(KEY,JSON.stringify({inventory:state.inventory,prefs:state.prefs,season:state.season,feedback:state.feedback,rejects:state.rejects,events:state.events.slice(-300),seed:state.seed,apiBase:state.apiBase}));}
+function log(event,data={}){state.events.push({event,at:new Date().toISOString(),...data});persist()}
+function has(n){return seasonNames.has(n)?!!state.season[n]:(state.inventory[n]||0)>0}
+function al(n){return names[n]?.a||['未确认']}
+function safe(n){let a=al(n);return !a.some(x=>state.prefs.allergy.includes(x)||x==='未确认')}
+function meat(n){return ['鸡胸肉','鸡腿肉','猪肉','猪里脊','牛肉','牛肉末','虾仁','鱼片','三文鱼','培根','火腿','香肠'].includes(n)}
+function forbidden(n){let map={'不吃猪肉':['猪肉','猪里脊','培根','火腿','香肠'],'不吃牛肉':['牛肉','牛肉末'],'不吃鸡肉':['鸡胸肉','鸡腿肉'],'不吃海鲜':['虾仁','鱼片','三文鱼','鱼露','蚝油']};return state.prefs.avoid.some(x=>(map[x]||[]).includes(n))}
+function needAmount(r,n){return r.main.includes(n)?1:r.side.includes(n)?(names[n]?.u==='count'?1:0.5):0}
+function candidate(r){if(r.t>30||r.tool!=='无'&&!state.prefs.tool.includes(r.tool)||state.prefs.cu!=='都做'&&r.cu!==state.prefs.cu||state.prefs.vegetarian&&!r.veg)return null;
+if(r.main.some(n=>!has(n)||!safe(n)||forbidden(n)))return null;
+if(r.main.some(n=>!names[n]))return null;
+const used=[...r.main],changes=[],needed=[...r.side.map(x=>[x,'配料']),...r.sp.map(x=>[x,'调料'])];
+for(const [n,role] of needed){
+ if(has(n)&&safe(n)&&!forbidden(n)&&!(state.prefs.vegetarian&&(['蚝油','鱼露','料酒'].includes(n)))){used.push(n);continue}
+ let rule=D.rules.find(x=>x.enabled&&x.target===n&&has(x.sub)&&safe(x.sub)&&!forbidden(x.sub)&&!(state.prefs.vegetarian&&['蚝油','鱼露','料酒'].includes(x.sub))&& !state.rejects.some(y=>y.recipe===r.id&&y.target===n&&y.sub===x.sub));
+ let sub=rule?.sub||null;
+ // Only omit optional aromatics and light seasonings; never omit critical salt/oil, sauces, thickeners, dairy.
+ let canOmit=['葱','姜','蒜','香草','罗勒','黑胡椒','白胡椒','糖','蜂蜜','辣椒','辣椒粉','孜然','花椒','柠檬','料酒','醋'].includes(n)||role==='配料';
+ if(!sub&&!canOmit)return null;
+ if(sub)used.push(sub);
+ changes.push({target:n,sub,kind:sub?'替换':'省略',role,impact:rule?.impact||'风味有变化',id:rule?.id||null,why:sub?`用家里已有的「${sub}」替代「${n}」，${rule.ctx}会略有差别。`:`可以不放「${n}」，菜仍可完成，但风味可能略淡。`});
+ if(changes.length>2)return null;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--tx);
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
-  font-size:15px;line-height:1.6}
-.wrap{max-width:640px;margin:0 auto;padding:16px 14px 60px}
-h1{font-size:18px;font-weight:600;margin:8px 0 2px}
-.sub{color:var(--tx3);font-size:13px;margin-bottom:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
-.card h2{font-size:15px;font-weight:600;margin:0 0 10px;display:flex;align-items:center;gap:8px}
-.step{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--tx);color:#fff;
-  font-size:12px;align-items:center;justify-content:center;flex:none}
-.hint{font-size:13px;color:var(--tx3);margin:-4px 0 10px}
-button{font-family:inherit;font-size:14px;border-radius:10px;border:1px solid var(--line2);
-  background:#fff;color:var(--tx);padding:9px 14px;cursor:pointer}
-button.primary{background:var(--tx);color:#fff;border-color:var(--tx)}
-button:disabled{opacity:.45;cursor:not-allowed}
-button.sm{padding:5px 10px;font-size:13px;border-radius:8px}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-input[type=text],input[type=password],select,textarea{font-family:inherit;font-size:14px;
-  border:1px solid var(--line2);border-radius:10px;padding:8px 10px;background:#fff;color:var(--tx);width:100%}
-textarea{resize:vertical;min-height:80px;font-size:13px}
-label.fld{display:block;font-size:12px;color:var(--tx2);margin:8px 0 4px}
-#preview{width:100%;max-height:260px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:none;margin-top:10px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.chip{background:var(--info-bg);border:1px solid #B5D4F4;border-radius:10px;padding:8px 10px;font-size:13px}
-.chip .nm{font-weight:600;color:#0C447C}
-.chip .meta{display:flex;gap:6px;margin-top:6px}
-.chip select{font-size:12px;padding:3px 4px;border-radius:6px;width:auto}
-.chip .del{color:var(--bad);cursor:pointer;font-size:12px;margin-left:2px}
-.empty{color:var(--tx3);font-size:13px;padding:6px 0}
-.rc{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
-.rc .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.rc .nm{font-size:15px;font-weight:600}
-.rc .tags{font-size:12px;color:var(--tx3);margin-top:2px}
-.sc{font-size:20px;font-weight:600;color:var(--ok);line-height:1;white-space:nowrap}
-.sc small{font-size:11px;color:var(--tx3);font-weight:400;display:block;margin-top:3px}
-.bar{height:6px;background:#EFEDE6;border-radius:3px;overflow:hidden;margin:10px 0 6px;display:flex}
-.bar i{display:block;height:100%}
-.b1{background:#1D9E75}.b2{background:#85B7EB}
-.legend{font-size:12px;color:var(--tx2);display:flex;gap:12px;flex-wrap:wrap}
-.lines{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
-.line{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:3px 0}
-.badge{font-size:11px;padding:2px 7px;border-radius:6px;white-space:nowrap;flex:none}
-.b-ok{background:var(--ok-bg);color:var(--ok)}
-.b-warn{background:var(--warn-bg);color:var(--warn)}
-.b-bad{background:var(--bad-bg);color:var(--bad)}
-.b-info{background:var(--info-bg);color:var(--info)}
-.b-gray{background:#F1EFE8;color:var(--tx2)}
-.note{font-size:12px;color:var(--tx2);margin-top:2px}
-.steps{margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--tx2)}
-.steps li{margin:3px 0}
-.details{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;display:none}
-.details.on{display:block}
-.mini{font-size:12px;color:var(--tx3)}
-.err{background:var(--bad-bg);color:var(--bad);border-radius:10px;padding:10px;font-size:13px;margin-top:10px;display:none}
-.cfg{display:none;margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
-.cfg.on{display:block}
-.foot{font-size:12px;color:var(--tx3);text-align:center;margin-top:24px;line-height:1.8}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <h1>清冰箱 · 食材识别菜谱推荐</h1>
-  <div class="sub">可执行的 Demo：识别冰箱食材 → 按「最大化利用」排序菜谱 → 缺料给出替换/省略建议</div>
-
-  <!-- Step 1 -->
-  <div class="card">
-    <h2><span class="step">1</span>拍照识别（或直接用示例冰箱）</h2>
-    <div class="hint">接了大模型就能真识别；没接也能用示例冰箱跑通后面的完整链路。</div>
-    <div class="row">
-      <input type="file" id="file" accept="image/*" capture="environment" style="flex:1;min-width:180px;font-size:13px">
-      <button class="primary" id="btnRec" disabled>识别</button>
-    </div>
-    <img id="preview" alt="">
-    <div class="row" style="margin-top:10px">
-      <button class="sm" data-f="上班族小冰箱">示例：上班族小冰箱</button>
-      <button class="sm" data-f="周末采购后">示例：周末采购后</button>
-      <button class="sm" data-f="临期清库存">示例：临期清库存</button>
-      <button class="sm" id="btnCfg">接入在线识别</button>
-    </div>
-
-    <div class="cfg" id="cfg">
-      <label class="fld">API Base URL（OpenAI 兼容，如 https://api.xxx.com/v1）</label>
-      <input type="text" id="base" placeholder="https://api.xxx.com/v1">
-      <label class="fld">API Key</label>
-      <input type="password" id="key" placeholder="sk-...">
-      <label class="fld">模型名</label>
-      <input type="text" id="model" placeholder="如 qwen-vl-max / gpt-4o / glm-4v">
-      <div class="mini" style="margin-top:8px">
-        若浏览器报 CORS，请改用同目录的 <code>recognize_vlm.py</code> 跑识别，再把输出的 JSON 粘到下面导入。
-      </div>
-    </div>
-
-    <div style="margin-top:10px">
-      <label class="fld">或导入识别结果 JSON（recognize_vlm.py 的输出）</label>
-      <textarea id="imp" placeholder='[{"name":"番茄","quantity":"适量","freshness":"新鲜"}]'></textarea>
-      <button class="sm" id="btnImp" style="margin-top:6px">导入</button>
-    </div>
-    <div class="err" id="err"></div>
-  </div>
-
-  <!-- Step 2 -->
-  <div class="card">
-    <h2><span class="step">2</span>校正识别结果（必做环节）</h2>
-    <div class="hint">识别不可能 100% 准，这一步是产品的一部分，不是补丁。份量只到粗粒度三档。</div>
-    <div class="row">
-      <select id="addSel" style="flex:1;min-width:160px"></select>
-      <button class="sm" id="btnAdd">添加食材</button>
-    </div>
-    <div class="chips" id="chips"></div>
-    <div class="empty" id="invEmpty">还没有食材，先识别或选个示例冰箱。</div>
-  </div>
-
-  <!-- Step 3 -->
-  <div class="card">
-    <h2><span class="step">3</span>推荐结果</h2>
-    <div class="row" style="margin-bottom:10px">
-      <button class="sm" id="fAll">全部</button>
-      <button class="sm" id="fFree">只看无需补货</button>
-      <span class="mini" id="cnt"></span>
-    </div>
-    <div id="res"></div>
-  </div>
-
-  <div class="foot">
-    推荐分 = 45 × 有效覆盖率（替换/省略后能做成的程度）<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;+ 20 × 原始覆盖率 + 25 × 库存利用率 + 6 × 用到的临期食材数<br>
-    库存利用率是关键：只按菜谱覆盖率排，用 2 样和用 5 样食材的菜会同分，<br>
-    那就退化成普通菜谱搜索了。油盐糖酱油葱姜蒜等常备调味料不计入缺料惩罚。
-  </div>
-</div>
-
-<script src="data.js"></script>
-<script>
-/* ---------- 名称归一：大模型输出的中文名 → 食材 id ---------- */
-const ALIAS = {
-  '西红柿':'tomato','圣女果':'tomato','小番茄':'tomato','马铃薯':'potato','洋芋':'potato',
-  '大白菜':'cabbage','青菜':'cabbage','上海青':'cabbage','小白菜':'cabbage','娃娃菜':'cabbage',
-  '鸡胸':'chicken','鸡脯肉':'chicken','鸡翅':'chickenleg','鸡翅中':'chickenleg','鸡腿肉':'chickenleg',
-  '瘦肉':'pork','肉末':'pork','肉丝':'pork','五花':'porkbelly','五花肉':'porkbelly',
-  '牛腩':'beef','牛肉块':'beef','羊排':'lamb','羊肉片':'lamb',
-  '虾仁':'shrimp','基围虾':'shrimp','明虾':'shrimp',
-  '北豆腐':'tofu','嫩豆腐':'tofu','老豆腐':'tofu','香干':'driedtofu','豆腐干':'driedtofu',
-  '挂面':'noodle','面条':'noodle','方便面':'noodle','吐司':'bread','切片面包':'bread',
-  '奶酪片':'cheese','芝士':'cheese','黄油块':'butter','纯牛奶':'milk',
-  '黑木耳':'woodear','云耳':'woodear','香菜':'cilantro','大葱':'scallion','小葱':'scallion','香葱':'scallion',
-  '生姜':'ginger','大蒜':'garlic','蒜头':'garlic','蒜瓣':'garlic',
-  '酱油':'soysauce','生抽酱油':'soysauce','老抽酱油':'darksoysauce',
-  '米醋':'vinegar','陈醋':'vinegar','白醋':'vinegar','料酒':'cookingwine','黄酒':'cookingwine',
-  '生粉':'starch','玉米淀粉':'starch','红薯粉':'starch','水淀粉':'starch',
-  '干辣椒':'driedchili','辣椒干':'driedchili','花椒粉':'sichuanpepper','麻椒':'sichuanpepper',
-  '八角':'staranise','月桂叶':'bayleaf','白胡椒':'pepper','黑胡椒':'pepper','胡椒粉':'pepper',
-  '芝麻油':'sesame','香油':'sesame','番茄沙司':'ketchup','番茄酱':'ketchup',
-  '咖喱':'curry','咖喱块':'curry','花生米':'peanut','龙口粉丝':'vermicelli',
-  '甜玉米':'corn','红萝卜':'carrot','青椒':'greenpepper','尖椒':'greenpepper','柿子椒':'greenpepper',
-  '西蓝花':'broccoli','四季豆':'greenbean','青瓜':'cucumber','油麦菜':'lettuce',
-  '西芹':'celery','干香菇':'shiitake','剩饭':'rice','隔夜饭':'rice'
-};
-const NAME2ID = {};
-Object.keys(ING).forEach(id=>{ NAME2ID[ING[id].n] = id; });
-Object.keys(ALIAS).forEach(k=>{ if(ING[ALIAS[k]]) NAME2ID[k] = ALIAS[k]; });
-
-function toId(name){
-  if(!name) return null;
-  let s = String(name).trim().replace(/[（(].*?[)）]/g,'').replace(/\s/g,'');
-  if(NAME2ID[s]) return NAME2ID[s];
-  const hit = Object.keys(NAME2ID).find(k=> s.includes(k) || k.includes(s));
-  return hit ? NAME2ID[hit] : null;
-}
-
-/* ---------- 状态 ---------- */
-let inv = [];
-let filtered = false;
-
-const $ = id=>document.getElementById(id);
-
-/* ---------- Step1 ---------- */
-let dataUrl = null;
-$('file').addEventListener('change', e=>{
-  const f = e.target.files && e.target.files[0];
-  if(!f) return;
-  const r = new FileReader();
-  r.onload = ev=>{
-    const img = new Image();
-    img.onload = ()=>{
-      const c = document.createElement('canvas');
-      const max = 1024;
-      let w = img.width, h = img.height;
-      if(w > max){ h = Math.round(h*max/w); w = max; }
-      c.width = w; c.height = h;
-      c.getContext('2d').drawImage(img,0,0,w,h);
-      dataUrl = c.toDataURL('image/jpeg', 0.8);
-      const p = $('preview');
-      p.src = dataUrl; p.style.display = 'block';
-      $('btnRec').disabled = false;
-    };
-    img.src = ev.target.result;
-  };
-  r.readAsDataURL(f);
-});
-
-$('btnCfg').onclick = ()=> $('cfg').classList.toggle('on');
-
-const PROMPT = '你是冰箱食材识别助手。仔细看图，列出图中所有可见的食材和食品。\n'+
-'只输出 JSON 数组，不要任何解释、不要 markdown 代码块，格式：\n'+
-'[{"name":"番茄","quantity":"适量","freshness":"新鲜"}]\n'+
-'quantity 只能是 少量/适量/充足 之一；freshness 只能是 新鲜/一般/快坏了 之一。\n'+
-'要求：中文食材名；同一食材只出现一次；装在袋子里或只露出一部分的也要尽量识别；不确定的不要输出。';
-
-$('btnRec').onclick = async ()=>{
-  const base = $('base').value.trim(), key = $('key').value.trim(), model = $('model').value.trim();
-  $('err').style.display='none';
-  if(!base || !key || !model){
-    $('err').textContent = '请先点「接入在线识别」填好 Base URL / Key / 模型名，或改用示例冰箱。';
-    $('err').style.display='block'; $('cfg').classList.add('on'); return;
-  }
-  const btn = $('btnRec'); btn.disabled = true; btn.textContent = '识别中...';
-  try{
-    const res = await fetch(base.replace(/\/+$/,'') + '/chat/completions', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body: JSON.stringify({model, temperature:0.2, messages:[
-        {role:'user', content:[{type:'text',text:PROMPT},{type:'image_url',image_url:{url:dataUrl}}]}
-      ]})
-    });
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const j = await res.json();
-    let txt = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content || '';
-    txt = String(txt).replace(/```json|```/g,'').trim();
-    const s = txt.indexOf('['), e2 = txt.lastIndexOf(']');
-    if(s<0 || e2<0) throw new Error('模型没有返回 JSON');
-    applyList(JSON.parse(txt.slice(s, e2+1)));
-  }catch(err){
-    $('err').textContent = '识别失败：' + err.message + '。若是 CORS 问题，请改用 recognize_vlm.py 后粘贴 JSON 导入。';
-    $('err').style.display='block';
-  }
-  btn.disabled = false; btn.textContent = '识别';
-};
-
-$('btnImp').onclick = ()=>{
-  try{ applyList(JSON.parse($('imp').value)); $('err').style.display='none'; }
-  catch(e){ $('err').textContent='JSON 解析失败：'+e.message; $('err').style.display='block'; }
-};
-
-document.querySelectorAll('[data-f]').forEach(b=>{
-  b.onclick = ()=>{ inv = SAMPLE_FRIDGES[b.dataset.f].map(x=>({...x})); renderInv(); run(); };
-});
-
-function applyList(list){
-  const merged = {};
-  list.forEach(x=>{
-    const id = toId(x.name);
-    if(!id) return;
-    const f = ['新鲜','一般','快坏了'].includes(x.freshness) ? x.freshness : '新鲜';
-    const q = ['少量','适量','充足'].includes(x.quantity) ? x.quantity : '适量';
-    if(!merged[id] || (f==='快坏了' && merged[id].f!=='快坏了')) merged[id] = {i:id, q, f};
-  });
-  inv = Object.values(merged);
-  renderInv(); run();
-}
-
-/* ---------- Step2 渲染 ---------- */
-function fillAddSel(){
-  const sel = $('addSel');
-  sel.innerHTML = '';
-  Object.keys(ING).sort((a,b)=>ING[a].c.localeCompare(ING[b].c)||ING[a].n.localeCompare(ING[b].n))
-    .forEach(id=>{
-      const o = document.createElement('option');
-      o.value = id; o.textContent = ING[id].n + '（' + ING[id].c + (ING[id].s?' · 常备':'') + '）';
-      sel.appendChild(o);
-    });
-}
-$('btnAdd').onclick = ()=>{
-  const id = $('addSel').value;
-  if(inv.some(x=>x.i===id)) return;
-  inv.push({i:id, q:'适量', f:'新鲜'}); renderInv(); run();
-};
-
-function renderInv(){
-  const box = $('chips'); box.innerHTML = '';
-  $('invEmpty').style.display = inv.length ? 'none' : 'block';
-  inv.forEach((it, idx)=>{
-    const d = document.createElement('div'); d.className = 'chip';
-    const nm = document.createElement('div'); nm.className='nm'; nm.textContent = ING[it.i].n;
-    const meta = document.createElement('div'); meta.className='meta';
-
-    const q = document.createElement('select');
-    ['少量','适量','充足'].forEach(v=>{
-      const o=document.createElement('option'); o.value=v; o.textContent=v;
-      if(it.q===v) o.selected=true; q.appendChild(o);
-    });
-    q.onchange = e=>{ it.q = e.target.value; };
-
-    const f = document.createElement('select');
-    ['新鲜','一般','快坏了'].forEach(v=>{
-      const o=document.createElement('option'); o.value=v; o.textContent=v;
-      if(it.f===v) o.selected=true; f.appendChild(o);
-    });
-    f.onchange = e=>{ it.f = e.target.value; run(); };
-
-    if(it.f==='快坏了'){ f.style.background='#FCEBEB'; f.style.color='#A32D2D'; }
-
-    const del = document.createElement('span'); del.className='del'; del.textContent='移除';
-    del.onclick = ()=>{ inv.splice(idx,1); renderInv(); run(); };
-
-    meta.appendChild(q); meta.appendChild(f); meta.appendChild(del);
-    d.appendChild(nm); d.appendChild(meta); box.appendChild(d);
-  });
-}
-
-/* ---------- Step3 匹配与替换引擎 ---------- */
-function l1pair(a,b){ return L1.find(l=>(l.a===a&&l.b===b)||(l.a===b&&l.b===a)); }
-
-function analyze(){
-  const ids = new Set(inv.map(x=>x.i));
-  const fresh = {}; inv.forEach(x=>fresh[x.i]=x.f);
-
-  const out = RECIPES.map(r=>{
-    // 必需 且 非常备 → 参与覆盖率计算
-    const reqLines = r.ing.filter(x=> x.req==='必需' && !ING[x.i].s);
-    const total = reqLines.length;
-    const matched = reqLines.filter(x=>ids.has(x.i));
-    const missingLines = reqLines.filter(x=>!ids.has(x.i));
-
-    const solved = [], needBuy = [];
-    let nSub = 0, nOmit = 0;
-
-    missingLines.forEach(m=>{
-      // L1：同义替换，优先用冰箱里已有的
-      const l1 = L1.find(l=>(l.a===m.i&&ids.has(l.b)) || (l.b===m.i&&ids.has(l.a)));
-      if(l1){
-        const other = (l1.a===m.i) ? l1.b : l1.a;
-        nSub++;
-        solved.push({kind:'L1', target:m.i, use:other, note:l1.note, impact:l1.impact});
-        return;
-      }
-      // L2：烹饪功能角色等价替换
-      const roles = (ING[m.i].r||[]).filter(x=>FUNCTIONAL_ROLES.includes(x));
-      let hit = null;
-      for(const rid of ids){
-        if(rid===m.i) continue;
-        const shared = (ING[rid].r||[]).filter(x=>roles.includes(x));
-        if(shared.length){ hit = {rid, role:shared[0]}; break; }
-      }
-      if(hit){
-        nSub++;
-        solved.push({kind:'L2', target:m.i, use:hit.rid, role:hit.role,
-          note:'同样用于「'+hit.role+'」，可以顶上', impact:'略有差别'});
-        return;
-      }
-      // L3：可省略
-      if(m.req !== '必需'){
-        nOmit++;
-        solved.push({kind:'L3', target:m.i, note:'属于可选/装饰，去掉不影响成菜', impact:'几乎无感'});
-        return;
-      }
-      // 只能补货
-      const alt = L1.find(l=>l.a===m.i||l.b===m.i);
-      needBuy.push({target:m.i, alt: alt ? (alt.a===m.i?alt.b:alt.a) : null, altNote: alt?alt.note:null});
-    });
-
-    const coverage  = total ? matched.length/total : 0;
-    const effective = total ? (matched.length + nSub + nOmit)/total : 0;
-
-    // 库存利用率：这道菜到底消耗掉你冰箱里多少东西
-    const usedCount = new Set(r.ing.filter(x=>ids.has(x.i) && !ING[x.i].s).map(x=>x.i)).size;
-    const utilization = inv.length ? usedCount/inv.length : 0;
-
-    let urgency = 0;
-    r.ing.forEach(x=>{ if(ids.has(x.i) && fresh[x.i]==='快坏了') urgency++; });
-
-    return {
-      r, total, matched:matched.length, missingLines, solved, needBuy,
-      coverage, effective, utilization, usedCount, urgency,
-      score: Math.round(45*effective + 20*coverage + 25*utilization + 6*urgency),
-      free: needBuy.length===0
-    };
-  }).sort((a,b)=> b.score - a.score);
-
-  return out;
-}
-
-const IMPACT_CLS = {'几乎无感':'b-ok','略有差别':'b-warn','会改变菜品性质':'b-bad'};
-
-function render(list){
-  const box = $('res'); box.innerHTML = '';
-  const data = list.filter(x=> !filtered || x.free);
-  $('cnt').textContent = '共 ' + data.length + ' 道';
-  if(!data.length){
-    box.innerHTML = '<div class="empty">没有符合条件的菜谱，试试添加食材或取消筛选。</div>'; return;
-  }
-
-  data.forEach((x, idx)=>{
-    const el = document.createElement('div'); el.className = 'rc';
-
-    const hd = document.createElement('div'); hd.className='hd';
-    const left = document.createElement('div');
-    const nm = document.createElement('div'); nm.className='nm'; nm.textContent = x.r.n;
-    const tg = document.createElement('div'); tg.className='tags';
-    tg.textContent = x.r.diff + ' · ' + x.r.t + '分钟 · ' + x.r.srv +
-      (x.urgency ? ' · 用掉 '+x.urgency+' 样临期' : '');
-    left.appendChild(nm); left.appendChild(tg);
-    const sc = document.createElement('div'); sc.className='sc';
-    sc.innerHTML = x.score + '<small>推荐分</small>';
-    hd.appendChild(left); hd.appendChild(sc);
-    el.appendChild(hd);
-
-    const bar = document.createElement('div'); bar.className='bar';
-    const b1 = document.createElement('i'); b1.className='b1'; b1.style.width = (x.coverage*100)+'%';
-    const b2 = document.createElement('i'); b2.className='b2'; b2.style.width = ((x.effective-x.coverage)*100)+'%';
-    bar.appendChild(b1); bar.appendChild(b2);
-    el.appendChild(bar);
-
-    const lg = document.createElement('div'); lg.className='legend';
-    lg.innerHTML = '<span>用掉你的 '+x.usedCount+'/'+inv.length+' 样</span>'+
-      '<span>菜谱已有 '+Math.round(x.coverage*100)+'%</span>'+
-      '<span>替换/省略后可做 '+Math.round(x.effective*100)+'%</span>'+
-      '<span>' + (x.free ? '<b style="color:#0F6E56">无需补货</b>' : '需补 '+x.needBuy.length+' 样') + '</span>';
-    el.appendChild(lg);
-
-    const det = document.createElement('div'); det.className='details';
-    const lines = document.createElement('div'); lines.className='lines';
-
-    x.r.ing.forEach(ing=>{
-      const has = inv.some(v=>v.i===ing.i);
-      const staple = !!ING[ing.i].s;
-      const row = document.createElement('div'); row.className='line';
-      const a = document.createElement('span');
-      a.textContent = ING[ing.i].n + ' ' + ing.q + (staple ? '（常备）' : '');
-      const b = document.createElement('span'); b.className='badge';
-      if(has){ b.className += ' b-ok'; b.textContent = '已有'; }
-      else{
-        const s = x.solved.find(v=>v.target===ing.i);
-        if(s){
-          if(s.kind==='L1'){ b.className += ' b-info'; b.textContent = '可用你已有的' + ING[s.use].n + '替代'; }
-          else if(s.kind==='L2'){ b.className += ' b-info'; b.textContent = '可用你已有的' + ING[s.use].n + '替代'; }
-          else { b.className += ' b-gray'; b.textContent = '可省略'; }
-        }else if(x.needBuy.find(v=>v.target===ing.i)){
-          b.className += ' b-bad'; b.textContent = '需补货';
-        }else{ b.className += ' b-gray'; b.textContent = '可选'; }
-      }
-      row.appendChild(a); row.appendChild(b); lines.appendChild(row);
-
-      const s = x.solved.find(v=>v.target===ing.i);
-      if(s){
-        const nt = document.createElement('div'); nt.className='note';
-        const ib = document.createElement('span');
-        ib.className = 'badge ' + (IMPACT_CLS[s.impact]||'b-gray');
-        ib.textContent = s.impact;
-        nt.appendChild(ib);
-        nt.appendChild(document.createTextNode(' ' + s.note));
-        const holder = document.createElement('div'); holder.style.margin='0 0 6px';
-        holder.appendChild(nt); lines.appendChild(holder);
-      }
-      const nb = x.needBuy.find(v=>v.target===ing.i);
-      if(nb && nb.alt){
-        const nt = document.createElement('div'); nt.className='note';
-        nt.textContent = '买不到的话，也可以用' + ING[nb.alt].n + '：' + nb.altNote;
-        const holder = document.createElement('div'); holder.style.margin='0 0 6px';
-        holder.appendChild(nt); lines.appendChild(holder);
-      }
-    });
-    det.appendChild(lines);
-
-    const ol = document.createElement('ol'); ol.className='steps';
-    x.r.steps.forEach(s=>{ const li=document.createElement('li'); li.textContent=s; ol.appendChild(li); });
-    det.appendChild(ol);
-    el.appendChild(det);
-
-    const more = document.createElement('button');
-    more.className='sm'; more.style.marginTop='10px'; more.textContent='看做法与替换明细';
-    more.onclick = ()=>{
-      det.classList.toggle('on');
-      more.textContent = det.classList.contains('on') ? '收起' : '看做法与替换明细';
-    };
-    el.appendChild(more);
-
-    box.appendChild(el);
-  });
-}
-
-function run(){ render(analyze()); }
-
-$('fAll').onclick = ()=>{ filtered=false; run(); };
-$('fFree').onclick = ()=>{ filtered=true; run(); };
-
-fillAddSel(); renderInv();
-</script>
-</body>
-</html>
+// Seasoning allergen and vegetarian safety applied to actually consumed ingredients, NOT absent originals.
+if(used.some(n=>!safe(n)||forbidden(n)||(state.prefs.vegetarian&&['蚝油','鱼露','料酒'].includes(n))))return null;
+let uniq=[...new Set(used.filter(n=>!seasonNames.has(n)))];
+let shortage=r.main.filter(n=>!seasonNames.has(n)&&state.inventory[n]<needAmount(r,n));
+return {...r,used,changes,utilization:uniq.reduce((v,n)=>v+Math.min(needAmount(r,n)||0.5,(state.inventory[n]||0)),0),shortage};}
+function recommend(){let list=D.recipes.map(candidate).filter(Boolean).filter(r=>r.heat<=state.prefs.heat||r.heat>state.prefs.heat&&r.sp.includes('辣椒')&&!r.main.includes('辣椒'));
+list.sort((a,b)=>b.utilization-a.utilization||a.changes.length-b.changes.length||a.steps.length-b.steps.length||a.t-b.t);
+let top=list.slice(0,3);if(top.length===3&&!top.some(x=>x.parallel)){const p=list.find(x=>x.parallel&&!top.some(y=>y.id===x.id));if(p)top[2]=p;}
+return {top,total:list.length};}
+function nav(page){state.page=page;state.search='';state.category='全部';if(page==='results')log('recommend_view');render();window.scrollTo(0,0)}
+function toast(s){document.querySelector('.toast')?.remove();let a=document.createElement('div');a.className='toast';a.textContent=s;document.body.appendChild(a);setTimeout(()=>a.remove(),2100)}
+function btn(t,action,cls=''){return `<button class="btn ${cls}" onclick="${action}">${t}</button>`}
+function sectionTitle(t,small=''){return `<div class="hrow"><h3>${t}</h3>${small?`<span class="sub">${small}</span>`:''}</div>`}
+function header(title,sub){return `<div class="top"><div><div class="eyebrow">YOUR KITCHEN · 一人份</div><h1 class="page-title">${title}</h1><p class="sub">${sub}</p></div><span class="pill">✦ 本地演示版</span></div>`}
+function home(){let n=Object.values(state.inventory).filter(x=>x>0).length;
+return header('今晚，冰箱里有什么？','不必再为一顿晚饭买一堆食材。先看看家里有什么。')+`<div class="hero"><div><h2>好好吃饭，从现有食材开始。</h2><p>不用额外采购，智能组合现有食材。缺一点调料？我们优先帮你找到靠谱的替代方案。</p>${btn('看看今晚吃什么 →',"nav('results')")}</div><div class="hero-emoji" aria-hidden="true">🥗</div></div><div class="stat-grid"><div class="stat"><span>冰箱里的食材</span><strong>${n}</strong></div><div class="stat"><span>常备调料</span><strong>${Object.values(state.season).filter(Boolean).length}</strong></div><div class="stat"><span>食谱库</span><strong>${D.recipes.length}</strong></div></div>${sectionTitle('你的冰箱','可随时修改库存')}${inventoryPreview()}<div class="actions" style="margin-top:18px">${btn('📷 拍照识别食材',"nav('scan')",'secondary')}${btn('添加更多食材',"nav('pantry')",'secondary')}${btn('设置忌口与厨具',"nav('settings')",'ghost')}</div><p class="demo-watermark">首次打开提供可编辑的示例库存；所有修改保存在当前浏览器中。</p>`}
+function inventoryPreview(){let arr=Object.keys(state.inventory).filter(n=>state.inventory[n]>0);if(!arr.length)return '<div class="empty">冰箱还是空的，先添加几样食材吧。</div>';return `<div class="option-grid">${arr.map(n=>`<span class="chip">${emoji(n)} ${esc(n)} · ${state.inventory[n]}${names[n]?.u==='count'?'个':'顿'}</span>`).join('')}</div>`}
+function pantry(){let cats=['全部',...Object.keys({'蔬菜':1,'蛋奶豆':1,'肉禽海鲜':1,'主食':1,'水果坚果':1,'调料':1})];let list=D.ingredients.filter(x=>(state.category==='全部'||state.category===x.c)&&(!state.search||[x.n,...x.aliases].some(a=>a.includes(state.search))));
+return header('把冰箱装进来','点选食材添加库存；也可以拍照识别并核对。')+`<div class="notice success">📷 不想逐个选？ <button class="btn small" onclick="nav('scan')">拍冰箱 · AI 识别</button> 识别后需要人工确认。</div>`+`<div class="toolbar"><input class="search" id="ingredient-search" placeholder="搜索番茄 / 西红柿 / 鸡蛋…" value="${esc(state.search)}" oninput="setSearch(this.value)"/><button class="btn secondary small" onclick="nav('confirm')">确认清单 (${Object.values(state.inventory).filter(x=>x>0).length}) →</button></div><div class="toolbar">${cats.map(c=>`<button class="chip ${state.category===c?'on':''}" onclick="setCat('${c}')">${c}</button>`).join('')}</div><div class="ingredient-grid">${list.map(x=>`<button class="ing ${has(x.n)?'selected':''}" onclick="toggleIngredient('${x.n}')"><span class="emoji">${emoji(x.n)}</span><b>${x.n}</b><small>${x.u==='boolean'?(has(x.n)?'常备中':'没有'):(state.inventory[x.n]||0)?`已有 ${state.inventory[x.n]}${x.u==='count'?'个':'顿'}`:'点击添加'}</small></button>`).join('')}</div>${list.length?'':'<div class="empty">没有找到。可以添加自定义食材，但过敏原未确认前不参与推荐。<br/><br/><button class="btn small" onclick="addCustom()">添加自定义食材</button></div>'}<div class="fixed-action"><span class="mini-txt">已选 ${Object.values(state.inventory).filter(x=>x>0).length} 种食材</span>${btn('确认我的冰箱 →',"nav('confirm')")}</div>`}
+function setSearch(v){state.search=v;let el=$('#ingredient-search');let pos=el?.selectionStart;render();let next=$('#ingredient-search');next?.focus();next?.setSelectionRange(pos,pos)}function setCat(c){state.category=c;render()}
+function toggleIngredient(n){if(seasonNames.has(n))state.season[n]=!state.season[n];else if(state.inventory[n])delete state.inventory[n];else state.inventory[n]=1;persist();render()}
+function addCustom(){let v=prompt('输入自定义食材名称（未核实过敏原前不参与匹配）');if(!v?.trim())return;v=v.trim().slice(0,20);if(names[v]){state.inventory[v]=1;persist();render();return}D.ingredients.push({n:v,c:'自定义',u:'meal',a:['未确认'],aliases:[],ref:1});names[v]=D.ingredients[D.ingredients.length-1];state.inventory[v]=1;persist();render();toast('已添加；自定义食材暂不参与推荐')}
+function confirmPage(){let arr=Object.keys(state.inventory).filter(n=>state.inventory[n]>0);return header('确认食材清单','数量不用精确到克，按照一人份和食材个数估算即可。')+`<div class="card narrow">${arr.length?arr.map(n=>`<div class="list-row"><div class="small-emoji">${emoji(n)}</div><div class="grow"><b>${esc(n)}</b><small>${names[n]?.u==='count'?'按个数记录':'一人份可做几顿'}</small></div><div class="qty"><button aria-label="减少${n}" onclick="changeQty('${n}',-1)">−</button><strong>${state.inventory[n]}</strong><button aria-label="增加${n}" onclick="changeQty('${n}',1)">+</button></div></div>`).join(''):'<div class="empty">还没有添加食材。</div>'}<div class="break"></div><div class="actions">${btn('继续添加/拍照',"nav('scan')",'secondary')}${btn('生成今晚的推荐 →',"nav('results')")}</div></div>${sectionTitle('常备调料','点击可修改是否拥有')}<div class="option-grid">${D.ingredients.filter(x=>x.u==='boolean').map(x=>`<button class="chip ${state.season[x.n]?'on':''}" onclick="toggleIngredient('${x.n}')">${state.season[x.n]?'✓ ':''}${x.n}</button>`).join('')}</div><p class="sub" style="margin-top:12px">提示：酱油、蚝油等复合调料可能包含隐藏过敏原，请核对包装。</p>`}
+function changeQty(n,d){let step=names[n]?.u==='meal'?0.5:1;state.inventory[n]=Math.max(0,Math.min(9,Math.round(((state.inventory[n]||0)+d*step)*2)/2));if(!state.inventory[n])delete state.inventory[n];persist();render()}
+function recipeIcon(r){if(r.n.includes('意面'))return '🍝';if(r.n.includes('汤'))return '🥣';if(r.n.includes('饭'))return '🍚';if(r.n.includes('面'))return '🍜';if(r.n.includes('蛋'))return '🍳';if(r.n.includes('沙拉'))return '🥗';if(r.n.includes('吐司')||r.n.includes('三明治'))return '🥪';return emoji(r.main[0])}
+function results(){let {top,total}=recommend();logOnce('matching_executed',String(total)+':'+top.map(x=>x.id).join(','));return header('你的今晚菜单','从冰箱现有食材出发，只推荐能实际做出来的菜。')+`<div class="notice success">✓ 已按照厨具、30 分钟上限、过敏/忌口、主料齐备、最多 2 处调整进行过滤。${state.prefs.allergy.length?'已排除过敏原：'+state.prefs.allergy.join('、')+'。':''}</div>${sectionTitle('为你挑选的 3 道菜',`共有 ${total} 道符合条件`)}${top.length?`<div class="recipes">${top.map((r,i)=>`<div class="card recipe"><div class="art" aria-hidden="true">${recipeIcon(r)}</div><div class="recipe-body"><div class="actions"><span class="tag">${i===0?'优先推荐':r.parallel?'可并行 / 少看管':'现有食材可做'}</span>${r.changes.length?`<span class="tag orange">${r.changes.length} 处调整</span>`:''}</div><h3>${r.n}</h3><div class="meta"><span>◷ ${r.t} 分钟</span><span>♨ ${r.tool}</span><span>♧ ${r.used.filter(n=>!seasonNames.has(n)).length} 种食材</span></div><p>${r.changes.length?`缺少 ${r.changes.map(x=>x.target).join('、')}，已有可执行的调整方案。`:'原料齐全，可以按原方案烹饪。'} ${r.steps.length} 个步骤。</p>${btn('查看改良食谱 →',`openRecipe(${r.id})`)}</div></div>`).join('')}</div>`:'<div class="empty">目前没有满足全部安全和食材条件的菜谱。请先检查库存、厨具或菜系。不会为了凑满三道而推荐缺少主料的菜。</div>' }<div class="actions" style="margin-top:23px">${btn('调整冰箱食材',"nav('pantry')",'secondary')}${btn('修改偏好',"nav('settings')",'ghost')}</div><p class="subtle">匹配为本地确定性计算，不会随机编造替换。若符合条件的菜少于 3 道，就如实显示。</p>`}
+let eventDedupe=new Set();function logOnce(e,s){if(eventDedupe.has(e+s))return;eventDedupe.add(e+s);log(e,{signature:s})}
+function openRecipe(id){state.recipe=id;state.showOriginal=false;state.page='detail';log('recipe_open',{id});render();window.scrollTo(0,0)}
+function detail(){let r=candidate(D.recipes.find(x=>x.id===state.recipe));if(!r)return header('这道菜已不适用','库存或过敏设置改变后，该菜不再满足推荐要求。')+btn('重新推荐',"nav('results')");state.result=r;return header(r.n,'已根据你的冰箱库存生成一人份改良版食谱。')+`<div class="card narrow"><div class="meta" style="font-size:14px"><span>⏱ ${r.t} 分钟</span><span>♨ ${r.tool}</span><span>◉ ${r.steps.length} 步</span><span>✦ ${r.changes.length} 处调整</span></div><div class="section"><h3>本次实际使用</h3><div class="option-grid">${[...new Set(r.used)].map(n=>`<span class="chip">${emoji(n)} ${n}</span>`).join('')}</div></div><div class="section"><h3>替换与省略说明</h3>${r.changes.length?r.changes.map(x=>`<div class="adjust"><b>${x.target} → ${x.sub||'不放'} <span class="tag orange">${x.impact}</span></b><p>${x.why}</p><button class="btn ghost small" onclick="rejectChange('${x.target}','${x.sub||''}')">不接受这个建议</button></div>`).join(''):'<div class="notice success">食材和调料都齐全，不需要做任何调整。</div>'}</div><div class="section"><div class="hrow"><h3>调料快速确认</h3><span class="sub">点击切换有 / 没有</span></div><div class="option-grid">${r.sp.map(n=>`<button class="chip ${has(n)?'on':''}" onclick="toggleSeasonDetail('${n}')">${has(n)?'✓ ':'○ '}${n}</button>`).join('')}</div></div><div class="section"><h3>${state.showOriginal?'原始菜谱':'改良后的烹饪步骤'}</h3>${r.steps.map((s,i)=>`<div class="list-row"><span class="pill">${i+1}</span><div class="grow">${esc(state.showOriginal?s:transformStep(s,r.changes))}</div></div>`).join('')}</div><div class="actions">${btn(state.showOriginal?'查看改良版':'查看原谱',"state.showOriginal=!state.showOriginal;render()",'secondary')}${btn('开始烹饪 →',"startCook()")}</div></div><div class="notice">安全提醒：本地规则仅供内测。食材中心需充分熟透，复合调料需自行核对包装过敏原；系统无法保证无交叉接触。</div>`}
+function transformStep(s,changes){let v=s;for(const c of changes){v=v.replaceAll(c.target,c.sub||'（省略）')}return v}
+function toggleSeasonDetail(n){state.season[n]=!state.season[n];persist();let r=candidate(D.recipes.find(x=>x.id===state.recipe));if(!r){state.page='results';toast('该菜不再符合可靠的替换条件，已重新筛选')}render()}
+function rejectChange(n,sub){let reason=prompt('为什么不接受？输入序号：\n1. 我没有这个\n2. 不想这样做\n3. 觉得不靠谱','3');if(!reason)return;let reasons={'1':'我没有这个','2':'不想这样做','3':'觉得不靠谱'};if(!reasons[reason])return toast('请输入 1、2 或 3');state.rejects.push({recipe:state.recipe,target:n,sub,reason:reasons[reason],at:new Date().toISOString()});log('adjustment_rejected',{id:state.recipe,target:n,sub,reason:reasons[reason]});state.page='results';render();toast('反馈已保存；该方案不再用于此菜')}
+function startCook(){let r=candidate(D.recipes.find(x=>x.id===state.recipe));if(!r){toast('食材已变动，需重新匹配');return}state.result=r;state.recipeStep=0;state.timerSec=0;state.timerRunning=false;state.page='cook';log('cooking_started',{id:r.id,ruleIds:r.changes.map(c=>c.id).filter(Boolean)});render();window.scrollTo(0,0)}
+function cook(){let r=state.result,i=state.recipeStep;return `<div class="cook-layout">${header('开始做 '+r.n,'一次只看一步，专心做好眼前这一件事。')}<div class="card"><div class="hrow"><span class="pill">第 ${i+1} / ${r.steps.length} 步</span><span class="mini-txt">预计总时长 ${r.t} 分钟</span></div><div class="progress"><span style="width:${(i+1)/r.steps.length*100}%"></span></div><div class="steps">${esc(transformStep(r.steps[i],r.changes))}</div><div class="break"></div><div class="hrow"><h3>厨房计时器</h3><div class="timer">${String(Math.floor(state.timerSec/60)).padStart(2,'0')}:${String(state.timerSec%60).padStart(2,'0')}</div></div><div class="actions"><button class="btn secondary small" onclick="addTimer(60)">+1 分钟</button><button class="btn secondary small" onclick="addTimer(300)">+5 分钟</button><button class="btn secondary small" onclick="state.timerRunning=!state.timerRunning;render()">${state.timerRunning?'暂停':'开始'}</button><button class="btn ghost small" onclick="state.timerSec=0;state.timerRunning=false;render()">清零</button></div><div class="break"></div><div class="actions">${btn('← 上一步',"step(-1)",'secondary')}${i+1===r.steps.length?btn('做完了 · 扣减库存 →',"finishCook()"):btn('下一步 →',"step(1)")}</div></div><div class="notice">计时只作提醒，具体熟度以食物实际状态为准。页面无法强制保持屏幕常亮。</div></div>`}
+function addTimer(x){state.timerSec+=x;render()}function step(d){state.recipeStep=Math.max(0,Math.min(state.result.steps.length-1,state.recipeStep+d));render()}
+function finishCook(){let r=state.result;state.timerRunning=false;state.pendingDeduction=Object.fromEntries([...new Set(r.used)].filter(n=>!seasonNames.has(n)&&names[n]&&state.inventory[n]>0).map(n=>[n,Math.min(state.inventory[n],needAmount(r,n)||0.5)]));state.page='finish';render()}
+function finish(){let r=state.result;return header('开饭啦！','完成前核对本次实际用量，再从冰箱库存中扣除。')+`<div class="card narrow"><h3>本次库存扣减</h3><p class="sub">主料默认扣 1 个/顿，配料默认扣 0.5 顿（计数型按 1 个）；请按实际消耗修正。</p>${Object.keys(state.pendingDeduction).map(n=>`<div class="list-row"><div class="small-emoji">${emoji(n)}</div><div class="grow"><b>${n}</b><small>现有 ${state.inventory[n]} ${names[n].u==='count'?'个':'顿'}</small></div><div class="qty"><button onclick="deductQty('${n}',-1)">−</button><strong>${state.pendingDeduction[n]}</strong><button onclick="deductQty('${n}',1)">+</button></div></div>`).join('')}${btn('确认做完并扣减库存 →',"applyDeduction()")}</div>`}
+function deductQty(n,d){let st=names[n]?.u==='meal'?0.5:1;state.pendingDeduction[n]=Math.max(0,Math.min(state.inventory[n],Math.round((state.pendingDeduction[n]+d*st)*2)/2));render()}
+function applyDeduction(){for(let [n,q] of Object.entries(state.pendingDeduction)){state.inventory[n]-=q;if(state.inventory[n]<=0)delete state.inventory[n]}log('cooking_completed',{id:state.result.id,changes:state.result.changes,deduction:state.pendingDeduction});state.page='feedback';render()}
+function feedbackPage(){return header('这顿饭，吃得怎么样？','最重要的是：替换和省略建议是否真的靠谱。')+`<div class="card narrow"><div class="hero" style="padding:20px"><div><h2>${state.result.n}</h2><p>共 ${state.result.changes.length} 处调整。请按真实结果评价，不要为了鼓励我们而给好评。</p></div><span style="font-size:55px">🍽️</span></div>${state.result.changes.map(x=>`<div class="adjust"><b>${x.target} → ${x.sub||'省略'}</b><p>${x.impact} · ${x.why}</p></div>`).join('')}<h3>替换效果如何？</h3><div class="feedback">${['很好','可接受','不行'].map(x=>btn(x,`submitFeedback('${x}')`,x==='不行'?'warn':'secondary')).join('')}</div></div>`}
+function submitFeedback(value){state.feedback.push({id:state.result.id,n:state.result.n,value,changes:state.result.changes,at:new Date().toISOString()});log('substitution_feedback',{id:state.result.id,value,ruleIds:state.result.changes.map(x=>x.id).filter(Boolean)});state.page='home';render();toast('反馈已保存在当前设备，谢谢你的真实评价')}
+function settings(){let all=['麸质','甲壳类','鱼类','蛋类','花生','大豆','乳制品','坚果','芝麻','贝类'];return header('你的厨房偏好','这些设置会即时参与每次推荐的硬过滤。')+`<div class="settings-grid"><div class="card"><h3>常做菜系</h3><div class="option-grid">${['中餐','西餐','都做'].map((s,i)=>`<button class="chip ${state.prefs.cu===['中','西','都做'][i]?'on':''}" onclick="pref('cu','${['中','西','都做'][i]}')">${s}</button>`).join('')}</div></div><div class="card"><h3>现有厨具</h3><div class="checks">${['炒锅','电饭煲','高压锅','空气炸锅'].map(t=>`<label class="check"><input type="checkbox" ${state.prefs.tool.includes(t)?'checked':''} onchange="togglePref('tool','${t}')">${t}</label>`).join('')}</div></div><div class="card"><h3>过敏原 · 严格排除</h3><div class="checks">${all.map(t=>`<label class="check"><input type="checkbox" ${state.prefs.allergy.includes(t)?'checked':''} onchange="togglePref('allergy','${t}')">${t}</label>`).join('')}</div><p class="subtle">复合调味品已标注常见隐藏过敏原；实际产品需自行查验配料表。</p></div><div class="card"><h3>不吃的肉类</h3><div class="checks">${['不吃猪肉','不吃牛肉','不吃鸡肉','不吃海鲜'].map(t=>`<label class="check"><input type="checkbox" ${state.prefs.avoid.includes(t)?'checked':''} onchange="togglePref('avoid','${t}')">${t}</label>`).join('')}</div><div class="break"></div><label class="check"><input type="checkbox" ${state.prefs.vegetarian?'checked':''} onchange="pref('vegetarian',this.checked)">只吃素食</label></div><div class="card"><h3>辣度偏好</h3><div class="option-grid">${['不辣','微辣','中辣','重辣'].map((s,i)=>`<button class="chip ${state.prefs.heat===i?'on':''}" onclick="pref('heat',${i})">${s}</button>`).join('')}</div></div><div class="card"><h3>演示数据</h3><p class="sub">所有食材、设置、评价都仅储存在当前浏览器。</p><button class="btn warn small" onclick="resetDemo()">重置到示例库存</button></div></div><div class="fixed-action"><span class="mini-txt">设置自动保存</span>${btn('查看推荐 →',"nav('results')")}</div>`}
+function pref(k,v){state.prefs[k]=v;persist();render()}function togglePref(k,v){let a=state.prefs[k];state.prefs[k]=a.includes(v)?a.filter(x=>x!==v):[...a,v];persist();render()}function resetDemo(){if(!confirm('确认清除当前浏览器中的库存、设置和反馈，恢复示例吗？'))return;localStorage.removeItem(KEY);location.reload()}
+function report(){let f=state.feedback,pass=f.filter(x=>['很好','可接受'].includes(x.value)).length;let counts={};for(let x of f)for(let c of x.changes||[]){let k=c.id||'omit:'+c.target;if(!counts[k])counts[k]={n:`${c.target} → ${c.sub||'省略'}`,total:0,bad:0};counts[k].total++;if(x.value==='不行')counts[k].bad++}return header('内测反馈看板','本地保存的匿名反馈与规则风险信号，仅用于 Demo 演示。')+`<div class="stat-grid"><div class="stat"><span>完成反馈</span><strong>${f.length}</strong></div><div class="stat"><span>很好 + 可接受</span><strong>${f.length?Math.round(pass/f.length*100)+'%':'—'}</strong></div><div class="stat"><span>拒绝替换次数</span><strong>${state.rejects.length}</strong></div></div><div class="card"><h3>逐条替换反馈</h3>${Object.values(counts).length?Object.values(counts).map(x=>`<div class="list-row"><div class="grow"><b>${x.n}</b><small>反馈 ${x.total} 条，不行 ${x.bad} 条</small></div><span class="tag ${x.total>=3&&x.bad/x.total>.3?'orange':''}">${x.total>=3&&x.bad/x.total>.3?'待复查':'样本不足或正常'}</span></div>`).join(''):'<div class="empty">还没有反馈。完成一道菜并评价后，这里会出现结果。</div>'}<div class="break"></div>${btn('导出反馈 JSON',"exportData()",'secondary')}</div><p class="subtle">注意：此 Demo 无服务器，不能跨设备同步反馈；同规则 3 次以上且差评比例超 30% 仅标记待复查，尚未构成正式线上自动下线服务。</p>`}
+function exportData(){let b=new Blob([JSON.stringify({version:D.version,feedback:state.feedback,rejects:state.rejects,events:state.events},null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='厨房灵感_demo_feedback.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+function scan(){return header('拍一下冰箱，看看有什么','照片交给在线视觉 AI 识别；你确认后才会写入库存。')+`<div class="card narrow"><h3>① 选择照片</h3><p class="sub">可以直接用手机相机拍照，也可以从相册选择。尽量拍到清楚的食材；被遮挡、袋装和模糊的物品可能无法识别。</p><div class="toolbar"><input type="file" id="scan-file" accept="image/jpeg,image/png,image/webp,image/*" capture="environment" onchange="previewScan(this)" style="max-width:100%"></div>${state.scanImage?`<img src="${state.scanImage}" alt="待识别的冰箱照片" style="max-width:100%;max-height:280px;object-fit:contain;border-radius:16px">`:''}<div class="break"></div><h3>② AI 服务地址</h3><p class="sub">部署后默认使用同域 /api/recognize。本地直接打开 HTML 时，请填写已部署的 HTTPS 后端地址（例如 https://your-app.example.com）。不要在这里填写 API 密钥。</p><input class="search" style="width:100%" placeholder="留空使用当前网站，或填写 https://..." value="${esc(state.apiBase)}" onchange="state.apiBase=this.value.trim().replace(/\/$/,'');persist()"><div class="actions" style="margin-top:14px"><button class="btn" onclick="recognizePhoto()" ${state.scanBusy?'disabled':''}>${state.scanBusy?'正在识别，请稍候…':'✨ 识别照片里的食材'}</button></div>${state.scanError?`<div class="notice">${esc(state.scanError)}</div>`:''}</div>${state.scanItems.length?`<div class="card narrow" style="margin-top:18px"><h3>③ 核对识别结果（${state.scanItems.length} 项）</h3><p class="sub">识别的是食材类别，不是可靠的库存数量。默认 1 个或 1 人份/顿，可增减或取消。没看到的食材不要勾选；识别结果可能有误。</p>${state.scanItems.map((x,i)=>`<div class="list-row"><div class="small-emoji">${emoji(x.n)}</div><div class="grow"><b>${esc(x.n)}</b><small>${x.confidence==='low'?'不确定 · 请特别核对':'AI 猜测 · 请核对'} · ${names[x.n]?.u==='count'?'按个数':'按一人份可吃几顿'}</small></div><div class="qty"><button onclick="scanQty(${i},-1)">−</button><strong>${x.qty}</strong><button onclick="scanQty(${i},1)">+</button></div><label class="check"><input type="checkbox" ${x.keep?'checked':''} onchange="state.scanItems[${i}].keep=this.checked;render()">入库</label></div>`).join('')}<div class="actions" style="margin-top:18px"><button class="btn secondary" onclick="nav('pantry')">手动补充漏识别</button><button class="btn" onclick="acceptScan()">确认并加入冰箱 →</button></div></div>`:''}<div class="notice">隐私与安全：照片会发送给你配置的 AI 服务商处理；此 Demo 的后端不持久保存图片。AI 不保证识别准确，尤其无法从图片判断重量、是否变质、隐藏过敏原。</div>`}
+let currentScanFile=null;
+function previewScan(input){let f=input.files?.[0];if(!f)return;if(!/^image\/(jpeg|png|webp)$/.test(f.type)){state.scanError='请上传 JPG、PNG 或 WebP 图片';render();return}if(f.size>10*1024*1024){state.scanError='图片过大（最大10 MB）';render();return}currentScanFile=f;state.scanItems=[];state.scanError='';const reader=new FileReader();reader.onload=()=>{state.scanImage=reader.result;render()};reader.readAsDataURL(f)}
+async function recognizePhoto(){if(!currentScanFile){state.scanError='请先选择一张照片';render();return}if(state.scanBusy)return;state.scanBusy=true;state.scanError='';render();try{const endpoint=(state.apiBase||'')+'/api/recognize';const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:state.scanImage}),signal:AbortSignal.timeout(25000)});const data=await response.json();if(!response.ok)throw Error(data.error||'识别请求失败');state.scanItems=(data.items||[]).filter(x=>names[x.name]&&names[x.name].u!=='boolean').slice(0,30).map(x=>({n:x.name,qty:1,keep:true,confidence:x.confidence||'low'}));if(!state.scanItems.length)state.scanError='没能可靠识别到食材，请手动添加或换张清晰照片。';else log('photo_recognition',{detected:state.scanItems.length});}catch(err){state.scanError='识别失败：'+err.message+'。请检查后端服务地址、网络和 API Key，或改用手动录入。'}finally{state.scanBusy=false;render()}}
+function scanQty(i,d){let x=state.scanItems[i];if(!x)return;let st=names[x.n].u==='meal'?0.5:1;x.qty=Math.max(st,Math.min(9,Math.round((x.qty+d*st)*2)/2));render()}
+function acceptScan(){let chosen=state.scanItems.filter(x=>x.keep);if(!chosen.length){toast('请先选择要入库的食材');return}for(const x of chosen){state.inventory[x.n]=Math.min(9,(state.inventory[x.n]||0)+x.qty)}log('photo_confirmed',{names:chosen.map(x=>x.n)});state.scanItems=[];state.scanImage='';currentScanFile=null;persist();nav('confirm');toast('已加入库存，请核对数量')}
+const links=[['home','⌂','首页'],['scan','📷','拍照'],['pantry','▦','食材'],['results','♧','推荐'],['settings','⚙','设置'],['report','▤','反馈']];
+function render(){let pages={home,scan,pantry,confirm:confirmPage,results,detail,cook,finish,feedback:feedbackPage,settings,report};let page=pages[state.page]||home;$('#app').innerHTML=`<div class="app"><aside class="side"><div class="logo"><div class="logo-mark">🌿</div> 好好吃饭</div>${links.map(([k,ic,t])=>`<button class="nav-btn ${state.page===k?'active':''}" onclick="nav('${k}')"><span>${ic}</span>${t}</button>`).join('')}<div class="aside-note"><strong>把冰箱吃空一点</strong>只用已有食材，只推荐靠谱做法。<br>没有确定规则，就不冒险推荐。</div></aside><main>${page()}</main></div><nav class="mobile-nav">${links.map(([k,ic,t])=>`<button class="${state.page===k?'active':''}" onclick="nav('${k}')"><span>${ic}</span>${t}</button>`).join('')}</nav>`;document.title=`好好吃饭 · ${state.page==='home'?'今晚吃什么':'冰箱食材智能食谱'}`}
+setInterval(()=>{if(state.timerRunning&&state.timerSec>0){state.timerSec--;let el=$('.timer');if(el)el.textContent=String(Math.floor(state.timerSec/60)).padStart(2,'0')+':'+String(state.timerSec%60).padStart(2,'0');if(state.timerSec===0){state.timerRunning=false;toast('计时结束，请检查食物熟度')}}},1000);
+render();
+</script></body></html>
