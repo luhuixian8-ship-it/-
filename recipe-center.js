@@ -7,8 +7,25 @@
     source: '全部',
     recipe: null
   };
-  const categories = ['全部', '主食', '蔬菜', '蛋白质', '其他'];
+  const foodCategories = ['全部', '主食', '蔬菜', '蛋白质', '其他'];
+const mealCategories = ['全部', '早餐', '午餐', '晚餐'];
 
+const breakfastIds = new Set([16,17,22,27,35,36,39,40,41,47,49]);
+const breakfastOnlyIds = new Set([35,36,39,40,49]);
+
+function mealsOf(r) {
+  if (Array.isArray(r.meals)) {
+    const meals = mealCategories.slice(1).filter(
+      meal => r.meals.includes(meal)
+    );
+    if (meals.length) return meals;
+  }
+
+  return [
+    ...(breakfastIds.has(r.id) ? ['早餐'] : []),
+    ...(breakfastOnlyIds.has(r.id) ? [] : ['午餐', '晚餐'])
+  ];
+}
   const sourceOf = r =>
     typeof r.source === 'string' && r.source.trim()
       ? r.source.trim()
@@ -60,7 +77,9 @@
 
   window.recipeCenterFilter = function (key, value) {
     if (!['mode', 'category', 'source', 'recipe'].includes(key)) return;
-
+if (key === 'mode' && value !== filter.mode) {
+  filter.category = '全部';
+}
     filter[key] = value;
     if (key !== 'recipe') filter.recipe = null;
     render();
@@ -98,7 +117,13 @@
 
     // 原有营养覆盖推荐完整保留。
     if (filter.mode === 'top') return tabs + originalResults();
+const categories = filter.mode === 'all'
+  ? mealCategories
+  : foodCategories;
 
+const categoryOf = filter.mode === 'all'
+  ? mealsOf
+  : categoriesOf;
     const sources = ['全部', ...new Set(D.recipes.map(sourceOf))];
 
     const controls = `
@@ -126,7 +151,7 @@
 
     let list = D.recipes.filter(r =>
       (filter.category === '全部' ||
-        categoriesOf(r).includes(filter.category)) &&
+        categoryOf(r).includes(filter.category)) &&
       (filter.source === '全部' ||
         sourceOf(r) === filter.source)
     );
@@ -219,7 +244,7 @@
                     </div>
                     <div class="recipe-body">
                       <span class="tag">
-                        ${esc(categoriesOf(r).join(' · '))}
+                        ${esc(categoryOf(r).join(' · '))}
                       </span>
                       <h3>${esc(r.n)}</h3>
                       <div class="meta">
